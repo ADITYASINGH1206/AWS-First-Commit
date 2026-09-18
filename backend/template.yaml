@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: CareSync - Localized AI-driven Medication Orchestrator for Eldercare
+
+Globals:
+  Function:
+    Timeout: 60
+    MemorySize: 512
+    Environment:
+      Variables:
+        LOCAL_ENV: "true"
+        OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+        LOCALSTACK_ENDPOINT: "http://host.docker.internal:4566"
+        AWS_DEFAULT_REGION: "us-east-1"
+
+Resources:
+  CareSyncApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+  CareSyncFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: app/
+      Handler: main.lambda_handler
+      Runtime: python3.11
+      Events:
+        ProcessNote:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CareSyncApi
+            Path: /process-note
+            Method: post
+        GetAdherence:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CareSyncApi
+            Path: /adherence
+            Method: get
+        PostAdherence:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CareSyncApi
+            Path: /adherence
+            Method: post
+        GetAlerts:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CareSyncApi
+            Path: /alerts
+            Method: get
+
+  # Local Cloud Resources
+  EmergencyAlertTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: caresync-emergency-alerts
+
+  AdherenceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: caresync-adherence-tracker
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: patient_id
+          AttributeType: S
+        - AttributeName: date_slot
+          AttributeType: S
+      KeySchema:
+        - AttributeName: patient_id
+          KeyType: HASH
+        - AttributeName: date_slot
+          KeyType: RANGE
+
+Outputs:
+  CareSyncApiUrl:
+    Description: "API Gateway endpoint URL for Prod environment"
+    Value: !Sub "http://127.0.0.1:3001/Prod/process-note"

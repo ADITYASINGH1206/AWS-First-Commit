@@ -1,0 +1,42 @@
+{
+  "patients": {
+    "Grandma_Bob": {
+      "name": "Roberta 'Grandma' Bob",
+      "age": 78,
+      "authorized_family": ["User::Alice", "User::Charlie"],
+      "current_medications": ["Lisinopril 10mg"],
+      "allergies": ["Penicillin"],
+      "notes": "Mild hypertension, chronic knee osteoarthritis"
+    },
+    "Grandpa_Arthur": {
+      "name": "Arthur Pendelton",
+      "age": 82,
+      "authorized_family": ["User::David"],
+      "current_medications": ["Warfarin 5mg"],
+      "allergies": ["Sulfa"],
+      "notes": "Atrial fibrillation, fall risk"
+    }
+  },
+  "interactions": {
+    "Lisinopril-Ibuprofen": {
+      "severity": "High",
+      "warning": "May decrease kidney function and reduce BP control.",
+      "clinical_guidance": "NSAIDs inhibit renal prostaglandins, attenuating the hypotensive effect of ACE inhibitors and escalating the risk of acute renal failure."
+    },
+    "Warfarin-Aspirin": {
+      "severity": "Critical",
+      "warning": "Severe compounding hemorrhagic risk; major bleeding hazard.",
+      "clinical_guidance": "Synergistic anticoagulant and antiplatelet inhibition markedly increases incidence of gastrointestinal and intracranial hemorrhages."
+    },
+    "Metformin-Contrast": {
+      "severity": "High",
+      "warning": "Increased risk of fatal lactic acidosis.",
+      "clinical_guidance": "Iodinated radiocontrast media can impair renal filtration, causing metformin accumulation."
+    },
+    "Sertraline-Tramadol": {
+      "severity": "High",
+      "warning": "Potential life-threatening Serotonin Syndrome.",
+      "clinical_guidance": "Dual serotonergic reuptake and release leads to excessive CNS serotonin stimulation."
+    }
+  }
+}
