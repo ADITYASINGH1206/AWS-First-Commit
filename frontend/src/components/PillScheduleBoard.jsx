@@ -9,8 +9,40 @@ const SLOT_CONFIG = [
   { key: 'bedtime', label: 'Bedtime Regimen', time: '10:00 PM', icon: Moon, color: '#2563eb', bg: '#eff6ff', border: '#bfdbfe' },
 ];
 
-export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
-  const [takenStatus, setTakenStatus] = useState({});
+export default function PillScheduleBoard({ schedule, onUpdateAdherence, adherenceLogs = {} }) {
+  // Sync state from persistent adherenceLogs prop
+  const [takenStatus, setTakenStatus] = useState(() => {
+    const initial = {};
+    if (schedule && adherenceLogs) {
+      SLOT_CONFIG.forEach(({ key }) => {
+        const list = schedule[key] || [];
+        list.forEach((pill, idx) => {
+          const logKey = `${key}_${pill.medication}`;
+          if (adherenceLogs[logKey]?.status === 'TAKEN') {
+            initial[`${key}-${idx}`] = true;
+          }
+        });
+      });
+    }
+    return initial;
+  });
+
+  // Re-sync whenever adherenceLogs or schedule changes
+  React.useEffect(() => {
+    if (schedule && adherenceLogs) {
+      const updated = {};
+      SLOT_CONFIG.forEach(({ key }) => {
+        const list = schedule[key] || [];
+        list.forEach((pill, idx) => {
+          const logKey = `${key}_${pill.medication}`;
+          if (adherenceLogs[logKey]?.status === 'TAKEN') {
+            updated[`${key}-${idx}`] = true;
+          }
+        });
+      });
+      setTakenStatus(updated);
+    }
+  }, [adherenceLogs, schedule]);
 
   if (!schedule) return null;
 

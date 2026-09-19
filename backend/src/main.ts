@@ -9,17 +9,27 @@
 import { evaluateAuthorization } from './cedarAuth.js';
 import { defaultAgent } from './agent.js';
 import { dispatchMultiChannelEmergencyAlert } from './notifier.js';
+import {
+  getPatients,
+  getPatient,
+  savePatient,
+  addMedication,
+  removeMedication,
+  getAdherence,
+  setAdherence,
+  getInteractions,
+  addInteraction,
+  getAlerts,
+  addAlert,
+  resetDb,
+} from './db.js';
 import type { LambdaEvent, LambdaResponse, DispatchedAlert } from './types.js';
-
-// In-memory stores mirroring DynamoDB and SNS logs for local simulation
-const ADHERENCE_STORE: Record<string, Record<string, any>> = {};
-const ALERTS_LOG: DispatchedAlert[] = [];
 
 function corsHeaders(): Record<string, string> {
   return {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,DELETE',
     'Access-Control-Allow-Headers': 'Content-Type,Authorization,X-Amz-Date,X-Api-Key',
     'Access-Control-Max-Age': '86400',
   };
@@ -43,11 +53,52 @@ export async function lambdaHandler(event: LambdaEvent): Promise<LambdaResponse>
 
   const path = event.path || '/process-note';
 
-  // Route: Adherence endpoints (Simulated Amazon DynamoDB)
+  // Route: Patient & Medication Management (Persistent DB)
+  if (path.includes('/patients')) {
+    if (httpMethod === 'GET') {
+      const patientId = event.queryStringParameters?.patient_id;
+      if (patientId) {
+        const patient = getPatient(patientId);
+        if (!patient) return createResponse(404, { error: 'Patient not found' });
+        return createResponse(200, { patient_id: patientId, patient });
+      }
+      return createResponse(200, { patients: getPatients() });
+    }
+
+    if (httpMethod === 'POST') {
+      let body: any = {};
+      if (event.body) {
+        body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+      }
+
+      if (path.includes('/medications/remove') || body.action === 'remove_medication') {
+        const patientId = body.patient_id || 'Grandma_Bob';
+        const medication = body.medication;
+        if (!medication) return createResponse(400, { error: 'Missing medication to remove' });
+        const updated = removeMedication(patientId, medication);
+        return createResponse(200, { status: 'success', patient: updated });
+      }
+
+      if (path.includes('/medications') || body.action === 'add_medication') {
+        const patientId = body.patient_id || 'Grandma_Bob';
+        const medication = body.medication;
+        if (!medication) return createResponse(400, { error: 'Missing medication' });
+        const updated = addMedication(patientId, medication);
+        return createResponse(200, { status: 'success', patient: updated });
+      }
+
+      // Save/Create patient
+      const patientId = body.patient_id || body.id || (body.name ? body.name.replace(/\s+/g, '_') : 'Patient_New');
+      const updated = savePatient(patientId, body);
+      return createResponse(200, { status: 'success', patient: updated, patient_id: patientId });
+    }
+  }
+
+  // Route: Adherence endpoints (Simulated Amazon DynamoDB with file persistence)
   if (path.includes('/adherence')) {
     if (httpMethod === 'GET') {
       const patient = event.queryStringParameters?.patient_id || 'Grandma_Bob';
-      const logs = ADHERENCE_STORE[patient] || {};
+      const logs = getAdherence(patient);
       return createResponse(200, { patient_id: patient, adherence_logs: logs });
     }
 
@@ -61,29 +112,46 @@ export async function lambdaHandler(event: LambdaEvent): Promise<LambdaResponse>
       const medication = body.medication || 'Lisinopril 10mg';
       const status = body.status || 'TAKEN';
 
-      if (!ADHERENCE_STORE[patient]) {
-        ADHERENCE_STORE[patient] = {};
-      }
-      const key = `${slot}_${medication}`;
-      ADHERENCE_STORE[patient][key] = {
-        medication,
-        slot,
-        status,
-        timestamp: new Date().toISOString(),
-        dynamodb_table: 'caresync-adherence-tracker',
-      };
-
+      const record = setAdherence(patient, slot, medication, status);
       return createResponse(200, {
         status: 'success',
         message: `Updated adherence for ${medication} to ${status}`,
-        record: ADHERENCE_STORE[patient][key],
+        record,
       });
     }
   }
 
-  // Route: Alerts endpoint (Simulated Amazon SNS log)
+  // Route: Alerts endpoint (Simulated Amazon SNS log with file persistence)
   if (path.includes('/alerts')) {
-    return createResponse(200, { alerts: ALERTS_LOG.slice(-20) });
+    return createResponse(200, { alerts: getAlerts().slice(0, 30) });
+  }
+
+  // Route: Interactions query and custom rule injection
+  if (path.includes('/interactions')) {
+    if (httpMethod === 'GET') {
+      return createResponse(200, { interactions: getInteractions() });
+    }
+    if (httpMethod === 'POST') {
+      let body: any = {};
+      if (event.body) {
+        body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+      }
+      if (!body.pair_key || !body.warning) {
+        return createResponse(400, { error: 'Missing pair_key or warning in interaction rule' });
+      }
+      const saved = addInteraction(body.pair_key, {
+        severity: body.severity || 'High',
+        warning: body.warning,
+        clinical_guidance: body.clinical_guidance || '',
+      });
+      return createResponse(200, { status: 'success', interaction: saved });
+    }
+  }
+
+  // Route: Reset Database to default state
+  if (path.includes('/reset-db')) {
+    const fresh = resetDb();
+    return createResponse(200, { status: 'success', message: 'Database reset to default seed', database: fresh });
   }
 
   // Route: Direct Notify Endpoint
@@ -155,7 +223,7 @@ export async function lambdaHandler(event: LambdaEvent): Promise<LambdaResponse>
             subject: `URGENT: Adverse Drug Conflict for ${patientId}`,
             message: `CareSync Safety Alert: High-risk drug interaction detected for ${patientId}. Warning: ${warning.warning}. Immediate clinical review advised.`,
           };
-          ALERTS_LOG.push(alertRecord);
+          addAlert(alertRecord);
           dispatchedAlerts.push(alertRecord);
         }
       }
