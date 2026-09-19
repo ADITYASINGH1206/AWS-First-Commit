@@ -18,6 +18,8 @@ export default function App() {
   const [selectedUser, setSelectedUser] = useState('User::Alice');
   const [patientId, setPatientId] = useState('Grandma_Bob');
   const [doctorsNote, setDoctorsNote] = useState(DEFAULT_DOCTOR_NOTE);
+  const [notifyTopic, setNotifyTopic] = useState('caresync-eldercare-alerts');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [resultData, setResultData] = useState(null);
   const [forbiddenError, setForbiddenError] = useState(null);
@@ -35,7 +37,10 @@ export default function App() {
     setForbiddenError(null);
 
     try {
-      const res = await processDoctorNote(selectedUser, patientId, doctorsNote);
+      const res = await processDoctorNote(selectedUser, patientId, doctorsNote, {
+        ntfyTopic,
+        phoneNumber,
+      });
       setIsLiveBackend(res.isLiveBackend);
 
       if (res.status === 403) {
@@ -294,7 +299,11 @@ export default function App() {
         isOpen={isSnsDrawerOpen}
         onClose={() => setIsSnsDrawerOpen(false)}
         alerts={resultData?.dispatched_emergency_alerts}
-        patientName={resultData?.patient_name || patientId}
+        patientName={resultData?.patient_name}
+        notifyTopic={notifyTopic}
+        setNotifyTopic={setNotifyTopic}
+        phoneNumber={phoneNumber}
+        setPhoneNumber={setPhoneNumber}
       />
 
       <ExecutionTraceModal

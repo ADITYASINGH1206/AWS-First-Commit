@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Cloud, Cpu, Activity, Smartphone, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Cloud, Cpu, Activity, Smartphone } from 'lucide-react';
 
 export default function Header({ isLiveBackend, onOpenPhoneAlerts }) {
   return (
@@ -61,30 +61,21 @@ export default function Header({ isLiveBackend, onOpenPhoneAlerts }) {
           </div>
         </div>
 
-        {/* Local Cloud Telemetry & Quick Triggers */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-          {/* Live Phone Alerts Button */}
-          <button
-            type="button"
+        {/* Local Cloud Simulation Status Indicators */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div
+            className="badge badge-crimson glass-card-interactive"
             onClick={onOpenPhoneAlerts}
-            className="cs-badge cs-badge-crimson cs-card-interactive"
-            style={{
-              cursor: 'pointer',
-              border: '1px solid var(--danger-border)',
-              background: 'rgba(220, 38, 38, 0.14)',
-              color: '#fca5a5',
-              padding: '0.4rem 0.85rem',
-            }}
-            title="Configure Real Phone Push Notifications & Carrier SMS"
+            style={{ cursor: 'pointer' }}
+            title="Configure Real Phone Push Notifications"
           >
-            <Smartphone size={14} color="#ef4444" />
-            <span>Phone Alerts: Live</span>
-            <span className="cs-pulse-dot" style={{ backgroundColor: '#ef4444' }}></span>
-          </button>
+            <Smartphone size={14} />
+            <span>Real Phone Alerts: Live 📲</span>
+            <span className="pulse-dot"></span>
+          </div>
 
-          {/* SAM Local Serverless Badge */}
-          <div className="cs-badge cs-badge-emerald" title="AWS SAM Local API Gateway & Lambda">
-            <Cloud size={14} color="#10b981" />
+          <div className="badge badge-emerald" title="AWS SAM Serverless Local API Gateway & Lambda">
+            <Cloud size={14} />
             <span>SAM Local :3001</span>
             <span className="cs-pulse-dot" style={{ backgroundColor: '#10b981' }}></span>
           </div>
