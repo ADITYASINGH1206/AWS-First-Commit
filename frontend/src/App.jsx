@@ -7,8 +7,11 @@ import IntakePage from './pages/IntakePage';
 import SecurityPage from './pages/SecurityPage';
 import AlertsPage from './pages/AlertsPage';
 import TelemetryPage from './pages/TelemetryPage';
+import FdaRagExplorerPage from './pages/FdaRagExplorerPage';
 import CaregiverSnsDrawer from './components/CaregiverSnsDrawer';
 import ExecutionTraceModal from './components/ExecutionTraceModal';
+import PrescriptionScannerModal from './components/PrescriptionScannerModal';
+import AdherenceEscalationModal from './components/AdherenceEscalationModal';
 
 function AppContent() {
   const {
@@ -17,6 +20,10 @@ function AppContent() {
     setIsSnsDrawerOpen,
     isTraceModalOpen,
     setIsTraceModalOpen,
+    isScannerOpen,
+    setIsScannerOpen,
+    isEscalationOpen,
+    setIsEscalationOpen,
     resultData,
     forbiddenError,
     patientId,
@@ -32,6 +39,7 @@ function AppContent() {
           {activeTab === 'home' && <HomePage />}
           {activeTab === 'schedule' && <SchedulePage />}
           {activeTab === 'intake' && <IntakePage />}
+          {activeTab === 'fda-rag' && <FdaRagExplorerPage />}
           {activeTab === 'security' && <SecurityPage />}
           {activeTab === 'alerts' && <AlertsPage />}
           {activeTab === 'telemetry' && <TelemetryPage />}
@@ -50,6 +58,16 @@ function AppContent() {
         isOpen={isTraceModalOpen}
         onClose={() => setIsTraceModalOpen(false)}
         traceData={resultData || forbiddenError}
+      />
+
+      <PrescriptionScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+      />
+
+      <AdherenceEscalationModal
+        isOpen={isEscalationOpen}
+        onClose={() => setIsEscalationOpen(false)}
       />
 
       {/* Clean Clinical Footer */}

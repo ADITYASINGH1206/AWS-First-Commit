@@ -10,6 +10,9 @@ import {
   Terminal,
   Smartphone,
   ArrowRight,
+  BookOpen,
+  Camera,
+  BellRing,
 } from 'lucide-react';
 
 export default function Header() {
@@ -18,6 +21,8 @@ export default function Header() {
     navigateTo,
     resultData,
     setIsSnsDrawerOpen,
+    setIsScannerOpen,
+    setIsEscalationOpen,
   } = useCareSync();
 
   const conflictCount = resultData?.interaction_warnings?.length || 0;
@@ -26,6 +31,7 @@ export default function Header() {
   const navItems = [
     { id: 'schedule', label: 'Daily Schedule', icon: CalendarDays },
     { id: 'intake', label: 'Clinical Intake', icon: Stethoscope },
+    { id: 'fda-rag', label: 'Clinical RAG', icon: BookOpen },
     { id: 'security', label: 'Access Control', icon: ShieldCheck },
     { id: 'alerts', label: 'Caregiver Alerts', icon: Bell, badge: conflictCount > 0 ? conflictCount : null },
     { id: 'telemetry', label: 'Diagnostics', icon: Terminal },
@@ -104,6 +110,28 @@ export default function Header() {
           </div>
         ) : (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => setIsScannerOpen(true)}
+              className="cs-btn cs-btn-secondary"
+              style={{ fontSize: '0.78rem', padding: '0.4rem 0.8rem' }}
+              title="Open Computer Vision Prescription Scanner"
+            >
+              <Camera size={14} color="var(--primary)" />
+              <span>Scan Bottle</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsEscalationOpen(true)}
+              className="cs-btn cs-btn-secondary"
+              style={{ fontSize: '0.78rem', padding: '0.4rem 0.8rem' }}
+              title="Test Smart Adherence Escalation Ladder"
+            >
+              <BellRing size={14} color="#d97706" />
+              <span>Escalation Ladder</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setIsSnsDrawerOpen(true)}

@@ -40,7 +40,9 @@ export function CareSyncProvider({ children }) {
   const [isSnsDrawerOpen, setIsSnsDrawerOpen] = useState(false);
   const [isTraceModalOpen, setIsTraceModalOpen] = useState(false);
   const [isMedManagerOpen, setIsMedManagerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'schedule' | 'intake' | 'security' | 'alerts' | 'telemetry'
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isEscalationOpen, setIsEscalationOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'schedule' | 'intake' | 'security' | 'alerts' | 'telemetry' | 'fda-rag'
 
   // Persist setters
   const setSelectedUser = (user) => {
@@ -62,7 +64,7 @@ export function CareSyncProvider({ children }) {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#/', '').replace('#', '');
-      const validTabs = ['home', 'schedule', 'intake', 'security', 'alerts', 'telemetry'];
+      const validTabs = ['home', 'schedule', 'intake', 'security', 'alerts', 'telemetry', 'fda-rag'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else if (!hash) {
@@ -270,6 +272,10 @@ export function CareSyncProvider({ children }) {
     setIsTraceModalOpen,
     isMedManagerOpen,
     setIsMedManagerOpen,
+    isScannerOpen,
+    setIsScannerOpen,
+    isEscalationOpen,
+    setIsEscalationOpen,
     activeTab,
     navigateTo,
     executeProcess,

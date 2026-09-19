@@ -23,6 +23,7 @@ import {
   addAlert,
   resetDb,
 } from './db.js';
+import { queryOpenFdaDrugLabel, performClinicalRagCheck } from './fdaRag.js';
 import type { LambdaEvent, LambdaResponse, DispatchedAlert } from './types.js';
 
 function corsHeaders(): Record<string, string> {
@@ -152,6 +153,67 @@ export async function lambdaHandler(event: LambdaEvent): Promise<LambdaResponse>
   if (path.includes('/reset-db')) {
     const fresh = resetDb();
     return createResponse(200, { status: 'success', message: 'Database reset to default seed', database: fresh });
+  }
+
+  // Route: Clinical RAG - FDA Drug Label Search (Live openFDA API + Monograph grounding)
+  if (path.includes('/fda/search')) {
+    const drugQuery = event.queryStringParameters?.drug || 'lisinopril';
+    const fdaLabel = await queryOpenFdaDrugLabel(drugQuery);
+    return createResponse(200, { status: 'success', drug: drugQuery, label: fdaLabel });
+  }
+
+  // Route: Clinical RAG - Safety & Interaction Verification
+  if (path.includes('/fda/rag-check')) {
+    let body: any = {};
+    if (event.body) {
+      body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+    }
+    const targetDrug = body.target_drug || 'Ibuprofen 400mg';
+    const activeRegimen = body.active_regimen || ['Lisinopril 10mg'];
+
+    const report = await performClinicalRagCheck(targetDrug, activeRegimen);
+    return createResponse(200, { status: 'success', report });
+  }
+
+  // Route: Smart Adherence Escalation Trigger
+  if (path.includes('/escalation/trigger')) {
+    let body: any = {};
+    if (event.body) {
+      body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
+    }
+    const patientId = body.patient_id || 'Grandma_Bob';
+    const missedMedications = body.missed_medications || ['Lisinopril 10mg'];
+    const slot = body.slot || 'Morning';
+    const tier = body.tier || 1; // 1: Chime, 2: Push, 3: Emergency SMS
+    const phone = body.phone || null;
+    const topic = body.topic || 'caresync-eldercare-alerts';
+
+    const warning = {
+      severity: tier === 3 ? 'Critical' : tier === 2 ? 'High' : 'Moderate',
+      warning: `[Escalation Tier ${tier}] Missed ${slot} medication dose: ${missedMedications.join(', ')} for ${patientId}. Immediate caregiver confirmation required.`,
+      drugs: missedMedications,
+    };
+
+    const dispatchResult = await dispatchMultiChannelEmergencyAlert(patientId, warning, topic, phone);
+
+    const alertRecord: DispatchedAlert = {
+      alert_id: `esc-${tier}-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      topic_arn: 'arn:aws:sns:us-east-1:000000000000:caresync-adherence-escalation',
+      patient_id: patientId,
+      severity: warning.severity,
+      drugs: missedMedications,
+      subject: `🚨 TIER ${tier} ADHERENCE ESCALATION: ${patientId}`,
+      message: warning.warning,
+    };
+    addAlert(alertRecord);
+
+    return createResponse(200, {
+      status: 'success',
+      tier,
+      alert: alertRecord,
+      dispatch: dispatchResult,
+    });
   }
 
   // Route: Direct Notify Endpoint
