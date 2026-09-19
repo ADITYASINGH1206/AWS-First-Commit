@@ -21,6 +21,11 @@
   --highlight-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
   --highlight-bottom: inset 0 -1px 0 0 rgba(0, 0, 0, 0.4);
 
+  /* Secondary & Accents */
+  --secondary: #0891b2;
+  --secondary-light: #34d399;
+  --shadow-danger: 0 0 24px rgba(220, 38, 38, 0.25);
+
   /* Primary Clinical Accents (Calm Cyan & Health Emerald) */
   --primary: #059669;
   --primary-hover: #047857;
@@ -143,10 +148,11 @@ h1, h2, h3, h4, h5, .font-heading {
 }
 
 /* Interactive Buttons */
-.btn-primary {
+.btn-primary,
+.cs-btn-primary {
   background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
   box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35), var(--highlight-top);
   padding: 0.75rem 1.4rem;
   border-radius: var(--radius-sm);
@@ -161,22 +167,27 @@ h1, h2, h3, h4, h5, .font-heading {
   min-height: 44px;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled),
+.cs-btn-primary:hover:not(:disabled) {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45), var(--highlight-top);
   transform: translateY(-1px);
 }
 
-.btn-primary:active:not(:disabled) {
+.btn-primary:active:not(:disabled),
+.cs-btn-primary:active:not(:disabled) {
   transform: translateY(0) scale(0.98);
 }
 
-.btn-primary:disabled {
+.btn-primary:disabled,
+.cs-btn-primary:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.btn-secondary {
+.btn-secondary,
+.cs-btn-secondary,
+.cs-btn {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-main);
   border: 1px solid var(--border-default);
@@ -194,14 +205,18 @@ h1, h2, h3, h4, h5, .font-heading {
   min-height: 40px;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.cs-btn-secondary:hover,
+.cs-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--border-strong);
   color: #ffffff;
   transform: translateY(-1px);
 }
 
-.btn-secondary:active {
+.btn-secondary:active,
+.cs-btn-secondary:active,
+.cs-btn:active {
   transform: translateY(0) scale(0.98);
 }
 

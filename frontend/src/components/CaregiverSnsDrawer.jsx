@@ -6,7 +6,7 @@ export default function CaregiverSnsDrawer({ isOpen, onClose, alerts, patientNam
 
   const [copiedTopic, setCopiedTopic] = useState(false);
   const [realSendStatus, setRealSendStatus] = useState(null); // 'sending' | 'sent' | 'error'
-  const [topicChannel] = useState(`caresync-${patientName.toLowerCase().replace(/[^a-z0-9]/g, '')}-alerts`);
+  const topicChannel = `caresync-${(patientName || 'patient').toLowerCase().replace(/[^a-z0-9]/g, '')}-alerts`;
 
   const currentAlert = alerts && alerts.length > 0 ? alerts[0] : {
     subject: `URGENT: Adverse Drug Conflict for ${patientName}`,
@@ -28,11 +28,11 @@ export default function CaregiverSnsDrawer({ isOpen, onClose, alerts, patientNam
       await fetch(`https://ntfy.sh/${topicChannel}`, {
         method: 'POST',
         headers: {
-          'Title': `CareSync Alert: ${patientName}`,
+          'Title': `CareSync Medication Safety Alert`,
           'Priority': 'urgent',
           'Tags': 'warning,pill,rotating_light',
         },
-        body: currentAlert.message,
+        body: currentAlert.message || 'Adverse drug conflict flagged during daily schedule calculation. Clinical review recommended.',
       });
       setRealSendStatus('sent');
       setTimeout(() => setRealSendStatus(null), 4000);
