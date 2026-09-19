@@ -3,25 +3,24 @@ import { Sun, Sunset, Moon, Sunrise, CheckCircle2, Circle, Clock, Check, Sparkle
 import confetti from 'canvas-confetti';
 
 const SLOT_CONFIG = [
-  { key: 'morning', label: 'Morning', time: '8:00 AM', icon: Sunrise, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.08)' },
-  { key: 'afternoon', label: 'Afternoon', time: '1:00 PM', icon: Sun, color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.08)' },
-  { key: 'evening', label: 'Evening', time: '7:00 PM', icon: Sunset, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.08)' },
-  { key: 'bedtime', label: 'Bedtime', time: '10:00 PM', icon: Moon, color: '#6366f1', bg: 'rgba(99, 102, 241, 0.08)' },
+  { key: 'morning', label: 'Morning Slot', time: '08:00 AM', icon: Sunrise, color: '#f59e0b', bg: 'rgba(217, 119, 6, 0.08)', border: 'rgba(245, 158, 11, 0.25)' },
+  { key: 'afternoon', label: 'Afternoon Slot', time: '01:00 PM', icon: Sun, color: '#06b6d4', bg: 'rgba(8, 145, 178, 0.08)', border: 'rgba(6, 182, 212, 0.25)' },
+  { key: 'evening', label: 'Evening Slot', time: '07:00 PM', icon: Sunset, color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.08)', border: 'rgba(139, 92, 246, 0.25)' },
+  { key: 'bedtime', label: 'Bedtime Slot', time: '10:00 PM', icon: Moon, color: '#3b82f6', bg: 'rgba(37, 99, 235, 0.08)', border: 'rgba(59, 130, 246, 0.25)' },
 ];
 
 export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
-  // Local state tracking which pills have been marked taken
   const [takenStatus, setTakenStatus] = useState({});
 
   if (!schedule) return null;
 
-  // Calculate total scheduled pills vs taken
+  // Compute adherence counts
   let totalPills = 0;
   let takenCount = 0;
 
   SLOT_CONFIG.forEach(({ key }) => {
     const list = schedule[key] || [];
-    list.forEach((item, idx) => {
+    list.forEach((_, idx) => {
       totalPills += 1;
       const id = `${key}-${idx}`;
       if (takenStatus[id]) takenCount += 1;
@@ -43,51 +42,63 @@ export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
       onUpdateAdherence(slotKey, pill.medication, newStatus ? 'TAKEN' : 'PENDING');
     }
 
-    // Confetti celebration if 100% completed
+    // Confetti celebration when reaching 100% adherence
     if (newStatus && takenCount + 1 === totalPills && totalPills > 0) {
       confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.7 },
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.65 },
+        colors: ['#059669', '#10b981', '#06b6d4', '#f59e0b'],
       });
     }
   };
 
   return (
-    <div style={{ marginTop: '1.5rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+    <section style={{ marginTop: '1.75rem' }} aria-label="Daily Medication Chronotherapy Timetable">
+      {/* Title & Adherence Meter */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.85rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#f8fafc' }}>
-            Daily Chronotherapy Pill Schedule
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-pure)' }}>
+              Daily Chronotherapy Pill Schedule
+            </h2>
+            <span className="cs-badge cs-badge-emerald" style={{ fontSize: '0.7rem' }}>
+              Chronotherapy Matrix Active
+            </span>
+          </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            AI-synthesized medication timetable with food requirements & adherence tracking
+            AI-orchestrated daily regimen with meal timing directives & state persistence (DynamoDB)
           </p>
         </div>
 
-        {/* Adherence Rate Metric */}
+        {/* Adherence Progress Counter */}
         {totalPills > 0 && (
           <div
+            className="cs-card"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.45rem 0.85rem',
-              background: 'rgba(255, 255, 255, 0.05)',
+              gap: '0.85rem',
+              padding: '0.5rem 1rem',
               borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--border-subtle)',
             }}
           >
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Adherence: <strong style={{ color: adherencePercent === 100 ? '#34d399' : '#f59e0b' }}>{adherencePercent}%</strong> ({takenCount}/{totalPills} taken)
+            <div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>
+                Today's Adherence Rate
+              </div>
+              <div style={{ fontSize: '0.92rem', fontWeight: 800, color: adherencePercent === 100 ? '#34d399' : '#f59e0b' }}>
+                {adherencePercent}% Completed ({takenCount}/{totalPills} doses)
+              </div>
             </div>
-            <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+
+            <div style={{ width: '70px', height: '8px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '4px', overflow: 'hidden' }}>
               <div
                 style={{
                   width: `${adherencePercent}%`,
                   height: '100%',
-                  background: adherencePercent === 100 ? '#10b981' : '#f59e0b',
-                  transition: 'width 0.3s ease',
+                  background: adherencePercent === 100 ? 'linear-gradient(90deg, #059669, #10b981)' : 'linear-gradient(90deg, #d97706, #f59e0b)',
+                  transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
               ></div>
             </div>
@@ -95,44 +106,79 @@ export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
         )}
       </div>
 
-      {/* Grid of time slots */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-        {SLOT_CONFIG.map(({ key, label, time, icon: Icon, color, bg }) => {
+      {/* 4-Slot Bento Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: '1rem' }}>
+        {SLOT_CONFIG.map(({ key, label, time, icon: Icon, color, bg, border }) => {
           const pills = schedule[key] || [];
+          const hasPills = pills.length > 0;
 
           return (
             <div
               key={key}
-              className="glass-panel"
+              className="cs-card"
               style={{
-                background: pills.length > 0 ? bg : 'rgba(15, 23, 42, 0.4)',
-                borderColor: pills.length > 0 ? 'var(--border-card)' : 'var(--border-subtle)',
+                background: hasPills ? bg : 'rgba(10, 16, 29, 0.4)',
+                borderColor: hasPills ? border : 'var(--border-subtle)',
                 padding: '1.25rem',
                 display: 'flex',
                 flexDirection: 'column',
+                borderRadius: 'var(--radius-md)',
               }}
             >
               {/* Slot Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', paddingBottom: '0.65rem', borderBottom: '1px solid var(--border-subtle)' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '1rem',
+                  paddingBottom: '0.7rem',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Icon size={18} color={color} />
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f8fafc' }}>
-                    {label}
-                  </h3>
+                  <div
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      borderRadius: '8px',
+                      background: 'rgba(0, 0, 0, 0.35)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon size={17} color={color} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '0.94rem', fontWeight: 700, color: '#ffffff' }}>
+                      {label}
+                    </h3>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.72rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    fontSize: '0.74rem',
+                    color: 'var(--text-muted)',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
                   <Clock size={12} />
                   <span>{time}</span>
                 </div>
               </div>
 
-              {/* Pill List */}
+              {/* Pills List */}
               {pills.length === 0 ? (
-                <div style={{ padding: '1.5rem 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.82rem' }}>
+                <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--text-dim)', fontSize: '0.84rem' }}>
                   No medications scheduled
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', flex: 1 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
                   {pills.map((pill, idx) => {
                     const id = `${key}-${idx}`;
                     const isTaken = !!takenStatus[id];
@@ -141,14 +187,14 @@ export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
                       <div
                         key={idx}
                         style={{
-                          padding: '0.75rem',
+                          padding: '0.85rem 1rem',
                           borderRadius: '10px',
-                          background: isTaken ? 'rgba(16, 185, 129, 0.12)' : 'rgba(0, 0, 0, 0.3)',
-                          border: `1px solid ${isTaken ? 'rgba(16, 185, 129, 0.35)' : 'var(--border-subtle)'}`,
+                          background: isTaken ? 'rgba(5, 150, 105, 0.16)' : 'rgba(0, 0, 0, 0.45)',
+                          border: `1px solid ${isTaken ? 'rgba(16, 185, 129, 0.45)' : 'var(--border-default)'}`,
                           display: 'flex',
                           alignItems: 'flex-start',
                           justifyContent: 'space-between',
-                          gap: '0.6rem',
+                          gap: '0.75rem',
                           transition: 'all 0.2s ease',
                         }}
                       >
@@ -156,33 +202,35 @@ export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                             <span
                               style={{
-                                fontWeight: 600,
-                                fontSize: '0.88rem',
-                                color: isTaken ? '#34d399' : '#f8fafc',
+                                fontWeight: 700,
+                                fontSize: '0.92rem',
+                                color: isTaken ? '#34d399' : '#ffffff',
                                 textDecoration: isTaken ? 'line-through' : 'none',
                               }}
                             >
-                              💊 {pill.medication}
+                              {pill.medication}
                             </span>
                           </div>
+
                           {pill.instructions && (
-                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem', lineHeight: 1.4 }}>
+                            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.3rem', lineHeight: 1.45 }}>
                               {pill.instructions}
                             </p>
                           )}
                         </div>
 
-                        {/* Mark Taken Button */}
+                        {/* Tactile Checkbox Button */}
                         <button
                           type="button"
-                          className={`pill-check-btn ${isTaken ? 'checked' : ''}`}
+                          className="cs-pill-check"
                           onClick={() => togglePillTaken(key, idx, pill)}
                           title={isTaken ? 'Mark as Pending' : 'Mark as Taken'}
+                          aria-label={`Mark ${pill.medication} as ${isTaken ? 'Pending' : 'Taken'}`}
                         >
                           {isTaken ? (
-                            <CheckCircle2 size={22} color="#10b981" />
+                            <CheckCircle2 size={24} color="#10b981" strokeWidth={2.4} />
                           ) : (
-                            <Circle size={22} color="#64748b" />
+                            <Circle size={24} color="#64748b" strokeWidth={1.8} />
                           )}
                         </button>
                       </div>
@@ -194,6 +242,6 @@ export default function PillScheduleBoard({ schedule, onUpdateAdherence }) {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }

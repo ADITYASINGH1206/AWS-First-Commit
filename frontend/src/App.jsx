@@ -7,7 +7,7 @@ import PillScheduleBoard from './components/PillScheduleBoard';
 import CaregiverSnsDrawer from './components/CaregiverSnsDrawer';
 import ExecutionTraceModal from './components/ExecutionTraceModal';
 import { processDoctorNote, updateAdherence } from './services/api';
-import { ShieldX, AlertCircle, Sparkles, User, HeartPulse, Terminal } from 'lucide-react';
+import { ShieldX, Sparkles, User, Terminal, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 const DEFAULT_DOCTOR_NOTE = (
   "Hi, this is Dr. Smith. I need Grandma Bob to start taking 400mg of Ibuprofen " +
@@ -63,48 +63,73 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Header isLiveBackend={isLiveBackend} />
+      <Header
+        isLiveBackend={isLiveBackend}
+        onOpenPhoneAlerts={() => setIsSnsDrawerOpen(true)}
+      />
 
-      <main style={{ maxWidth: '1400px', width: '100%', margin: '0 auto', padding: '2rem 1.5rem', flex: 1 }}>
-        {/* Top Notice Banner */}
+      <main style={{ maxWidth: '1440px', width: '100%', margin: '0 auto', padding: '2rem 1.75rem', flex: 1 }}>
+        {/* Top Notice & Quick Access Bar */}
         <div
+          className="cs-card"
           style={{
-            marginBottom: '1.5rem',
-            padding: '0.85rem 1.25rem',
-            borderRadius: '12px',
-            background: 'linear-gradient(90deg, rgba(16, 185, 129, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%)',
-            border: '1px solid rgba(16, 185, 129, 0.25)',
+            marginBottom: '1.75rem',
+            padding: '1rem 1.4rem',
+            background: 'linear-gradient(90deg, rgba(8, 145, 178, 0.08) 0%, rgba(5, 150, 105, 0.08) 100%)',
+            border: '1px solid rgba(8, 145, 178, 0.25)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
             flexWrap: 'wrap',
-            gap: '0.5rem',
+            gap: '0.75rem',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Sparkles size={18} color="#10b981" />
-            <span style={{ fontSize: '0.88rem', color: '#f1f5f9' }}>
-              <strong>AWS First Commit Hackathon</strong> &bull; Track: <em>Build It (Local / AWS-Simulated)</em>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: 'rgba(5, 150, 105, 0.16)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'var(--secondary-light)',
+              }}
+            >
+              <Sparkles size={18} />
+            </div>
+            <div style={{ fontSize: '0.88rem', color: 'var(--text-bright)' }}>
+              <strong>AWS First Commit Hackathon</strong> &bull; Track:{' '}
+              <span style={{ color: 'var(--primary-light)', fontWeight: 600 }}>Build It: Local / AWS-Simulated</span>
+            </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             {resultData && (
               <button
                 type="button"
-                className="btn-secondary"
+                className="cs-btn cs-btn-secondary"
                 onClick={() => setIsTraceModalOpen(true)}
-                style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem' }}
+                style={{ fontSize: '0.8rem', padding: '0.45rem 0.9rem' }}
+                title="Inspect raw JSON payloads and Cedar/Strands execution logs"
               >
-                <Terminal size={14} color="#06b6d4" />
+                <Terminal size={15} color="var(--primary-light)" />
                 <span>Inspect AWS Lambda JSON Trace</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Top Grid: Cedar Security Gate & Doctor Voice Note Recorder */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
+        {/* Top Grid: Cedar Security Gate & Doctor Voice Note Dictation Station */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '1.75rem',
+          }}
+        >
           <CedarSecuritySelector
             selectedUser={selectedUser}
             setSelectedUser={setSelectedUser}
@@ -122,57 +147,65 @@ export default function App() {
         {/* Forbidden Security Interception Card (When Eve is selected) */}
         {forbiddenError && (
           <div
-            className="glass-panel animate-fade-in"
+            className="cs-card"
             style={{
-              padding: '1.5rem',
-              border: '2px solid var(--danger)',
-              background: 'rgba(239, 68, 68, 0.12)',
+              padding: '1.75rem',
+              border: '2px solid var(--danger-border)',
+              background: 'rgba(220, 38, 38, 0.08)',
               boxShadow: 'var(--shadow-danger)',
-              marginBottom: '1.5rem',
+              marginBottom: '1.75rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem', flexWrap: 'wrap' }}>
               <div
                 style={{
-                  padding: '0.75rem',
+                  width: '52px',
+                  height: '52px',
                   borderRadius: '12px',
-                  background: 'rgba(239, 68, 68, 0.25)',
+                  background: 'rgba(220, 38, 38, 0.2)',
+                  border: '1px solid var(--danger-border)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  color: 'var(--danger-light)',
+                  flexShrink: 0,
                 }}
               >
-                <ShieldX size={32} color="#ef4444" />
+                <ShieldX size={30} />
               </div>
 
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-                  <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fca5a5' }}>
+              <div style={{ flex: 1, minWidth: '280px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                  <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#fca5a5' }}>
                     403 FORBIDDEN — CEDAR AUTHORIZATION REJECTED
                   </h3>
-                  <span className="badge badge-crimson">Zero-Trust Block</span>
+                  <span className="cs-badge cs-badge-crimson">
+                    <ShieldAlert size={12} />
+                    <span>Zero-Trust Gate Denied</span>
+                  </span>
                 </div>
 
-                <p style={{ fontSize: '0.92rem', color: '#fee2e2', marginBottom: '0.75rem', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '0.92rem', color: '#fee2e2', marginBottom: '1rem', lineHeight: 1.5 }}>
                   {forbiddenError.message || forbiddenError.error}
                 </p>
 
                 <div
                   style={{
-                    padding: '0.75rem 1rem',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    borderRadius: '8px',
+                    padding: '1rem 1.25rem',
+                    background: 'var(--surface-0)',
+                    borderRadius: '10px',
                     fontFamily: 'var(--font-mono)',
-                    fontSize: '0.78rem',
-                    color: '#cbd5e1',
-                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    fontSize: '0.8rem',
+                    color: 'var(--text-muted)',
+                    border: '1px solid var(--danger-border)',
+                    lineHeight: 1.6,
                   }}
                 >
-                  <div><strong>Principal Attempt:</strong> {selectedUser}</div>
-                  <div><strong>Protected Resource:</strong> Patient::{patientId}</div>
-                  <div><strong>Required Policy:</strong> permit(principal, action == Action::"ViewPatientRecord", resource) when {'{'} principal in resource.authorized_family {'}'};</div>
-                  <div style={{ color: '#f87171', marginTop: '0.25rem' }}>
-                    <strong>Cedar Decision:</strong> Deny (Unauthorized caller halted before accessing medical history)
+                  <div><strong style={{ color: 'var(--text-bright)' }}>Principal Caller:</strong> {selectedUser}</div>
+                  <div><strong style={{ color: 'var(--text-bright)' }}>Target Resource:</strong> Patient::{patientId}</div>
+                  <div><strong style={{ color: 'var(--text-bright)' }}>Cedar Enforced Rule:</strong> permit(principal, action == Action::"ViewPatientRecord", resource) when {'{'} principal in resource.authorized_family {'}'};</div>
+                  <div style={{ color: 'var(--danger-light)', marginTop: '0.4rem', fontWeight: 600 }}>
+                    Cedar Verdict: Explicit Deny &bull; Caller halted before medical data or agent loop execution
                   </div>
                 </div>
               </div>
@@ -182,57 +215,59 @@ export default function App() {
 
         {/* Success Output Flow */}
         {resultData && (
-          <div className="animate-fade-in">
+          <div>
             {/* Patient Header & Active Regimen Bar */}
             <div
-              className="glass-panel"
+              className="cs-card"
               style={{
-                padding: '1.25rem 1.5rem',
+                padding: '1.25rem 1.6rem',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '1rem',
-                marginBottom: '1rem',
+                gap: '1.25rem',
+                marginBottom: '1.5rem',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div
                   style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '50%',
-                    background: 'rgba(16, 185, 129, 0.15)',
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: 'rgba(5, 150, 105, 0.16)',
+                    border: '1px solid rgba(5, 150, 105, 0.3)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    color: 'var(--secondary-light)',
                   }}
                 >
-                  <User size={22} color="#10b981" />
+                  <User size={24} />
                 </div>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-bright)' }}>
                       {resultData.patient_name || resultData.patient_id}
                     </h2>
-                    <span className="badge badge-emerald" style={{ fontSize: '0.7rem' }}>
-                      Authorized Access
+                    <span className="cs-badge cs-badge-emerald" style={{ fontSize: '0.72rem' }}>
+                      <CheckCircle2 size={12} />
+                      <span>Cedar Authorized</span>
                     </span>
                   </div>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    Active Regimen on File: <strong>{resultData.current_medications?.join(', ') || 'None'}</strong>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                    Active Regimen on File: <strong style={{ color: 'var(--text-bright)' }}>{resultData.current_medications?.join(', ') || 'None'}</strong>
                   </p>
                 </div>
               </div>
 
               {/* Agent LLM Engine Badge */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
                     Strands Agent Engine
                   </div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 600, color: '#06b6d4' }}>
+                  <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--primary-light)', fontFamily: 'var(--font-mono)' }}>
                     {resultData.llm_engine}
                   </div>
                 </div>
@@ -259,7 +294,7 @@ export default function App() {
         isOpen={isSnsDrawerOpen}
         onClose={() => setIsSnsDrawerOpen(false)}
         alerts={resultData?.dispatched_emergency_alerts}
-        patientName={resultData?.patient_name}
+        patientName={resultData?.patient_name || patientId}
       />
 
       <ExecutionTraceModal
@@ -268,10 +303,29 @@ export default function App() {
         traceData={resultData || forbiddenError}
       />
 
-      {/* Minimal Footer */}
-      <footer style={{ padding: '1.5rem', textAlign: 'center', borderTop: '1px solid var(--border-subtle)', color: 'var(--text-dim)', fontSize: '0.78rem' }}>
-        CareSync Eldercare Orchestrator &bull; Local Cloud Simulation (AWS SAM CLI &bull; LocalStack &bull; Cedar Engine &bull; Strands Agents SDK)
+      {/* Minimal Accessible Footer */}
+      <footer
+        style={{
+          padding: '1.75rem 1.5rem',
+          textAlign: 'center',
+          borderTop: '1px solid var(--border-subtle)',
+          color: 'var(--text-dim)',
+          fontSize: '0.8rem',
+          background: 'var(--surface-0)',
+        }}
+      >
+        <div style={{ maxWidth: '1440px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            CareSync Eldercare Medication Orchestrator &bull; Local AWS Cloud Simulation
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <span className="cs-badge cs-badge-cyan" style={{ fontSize: '0.7rem' }}>AWS SAM CLI</span>
+            <span className="cs-badge cs-badge-emerald" style={{ fontSize: '0.7rem' }}>Cedar Engine</span>
+            <span className="cs-badge cs-badge-amber" style={{ fontSize: '0.7rem' }}>Strands SDK</span>
+          </div>
+        </div>
       </footer>
     </div>
   );
 }
+
