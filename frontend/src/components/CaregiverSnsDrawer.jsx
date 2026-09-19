@@ -18,15 +18,11 @@ export default function CaregiverSnsDrawer({
 
   if (!isOpen) return null;
 
-  const [copiedTopic, setCopiedTopic] = useState(false);
-  const [realSendStatus, setRealSendStatus] = useState(null); // 'sending' | 'sent' | 'error'
-  const topicChannel = `caresync-${(patientName || 'patient').toLowerCase().replace(/[^a-z0-9]/g, '')}-alerts`;
-
   const currentAlert = alerts && alerts.length > 0 ? alerts[0] : {
     subject: `URGENT: Adverse Drug Conflict for ${patientName}`,
     message: `CareSync Safety Alert: High-risk drug interaction detected for ${patientName}. Lisinopril 10mg + Ibuprofen 400mg may decrease kidney function and reduce BP control. Immediate clinical review advised.`,
     timestamp: new Date().toISOString(),
-    topic_arn: 'arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts',
+    topic_arn: 'caresync-emergency-alerts',
   };
 
   const activeTopic = notifyTopic || 'caresync-eldercare-alerts';
@@ -61,8 +57,8 @@ export default function CaregiverSnsDrawer({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(3, 7, 18, 0.85)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+        backdropFilter: 'blur(8px)',
         zIndex: 100,
         display: 'flex',
         justifyContent: 'flex-end',
@@ -70,18 +66,19 @@ export default function CaregiverSnsDrawer({
       onClick={onClose}
     >
       <aside
-        className="cs-card"
+        className="cs-card animate-drawer"
         style={{
           width: '100%',
           maxWidth: '520px',
-          background: 'var(--bg-secondary)',
-          borderLeft: '1px solid var(--border-card)',
+          background: '#ffffff',
+          borderLeft: '1px solid var(--border-default)',
           height: '100%',
           padding: '1.75rem 1.5rem',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '-10px 0 40px rgba(0,0,0,0.5)',
+          boxShadow: '-10px 0 35px rgba(0, 0, 0, 0.1)',
           overflowY: 'auto',
+          borderRadius: 0,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -93,22 +90,21 @@ export default function CaregiverSnsDrawer({
                 width: '38px',
                 height: '38px',
                 borderRadius: '10px',
-                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.3) 0%, rgba(245, 158, 11, 0.2) 100%)',
-                border: '1px solid rgba(239, 68, 68, 0.4)',
+                background: '#fee2e2',
+                border: '1px solid #fca5a5',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#f87171',
               }}
             >
-              <Bell size={20} color="#ef4444" />
+              <Bell size={20} color="#dc2626" />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc' }}>
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-pure)' }}>
                 Caregiver Emergency Alert System
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Real Mobile Push + AWS SNS Local & Live Delivery
+                Real Mobile Push & SMS Alert Dispatch
               </p>
             </div>
           </div>
@@ -126,15 +122,14 @@ export default function CaregiverSnsDrawer({
 
         {/* Tab Switcher */}
         <div
-          className="cs-card"
           style={{
             display: 'flex',
             gap: '0.5rem',
-            padding: '0.25rem',
-            background: 'rgba(0, 0, 0, 0.35)',
+            padding: '0.35rem',
+            background: 'var(--surface-2)',
             borderRadius: '10px',
             marginBottom: '1.25rem',
-            border: '1px solid var(--border-subtle)',
+            border: '1px solid var(--border-default)',
           }}
         >
           <button
@@ -152,8 +147,9 @@ export default function CaregiverSnsDrawer({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.4rem',
-              background: activeTab === 'live_push' ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
-              color: activeTab === 'live_push' ? '#34d399' : 'var(--text-muted)',
+              background: activeTab === 'live_push' ? '#ffffff' : 'transparent',
+              color: activeTab === 'live_push' ? '#059669' : 'var(--text-muted)',
+              boxShadow: activeTab === 'live_push' ? 'var(--shadow-sm)' : 'none',
               transition: 'all 0.2s',
             }}
           >
@@ -176,13 +172,14 @@ export default function CaregiverSnsDrawer({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.4rem',
-              background: activeTab === 'simulated_sms' ? 'rgba(99, 102, 241, 0.2)' : 'transparent',
-              color: activeTab === 'simulated_sms' ? '#a5b4fc' : 'var(--text-muted)',
+              background: activeTab === 'simulated_sms' ? '#ffffff' : 'transparent',
+              color: activeTab === 'simulated_sms' ? '#2563eb' : 'var(--text-muted)',
+              boxShadow: activeTab === 'simulated_sms' ? 'var(--shadow-sm)' : 'none',
               transition: 'all 0.2s',
             }}
           >
             <Radio size={15} />
-            <span>AWS SNS Local Preview</span>
+            <span>SMS Preview</span>
           </button>
         </div>
 
@@ -191,26 +188,26 @@ export default function CaregiverSnsDrawer({
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1 }}>
             <div
               style={{
-                padding: '1rem',
+                padding: '1.15rem',
                 borderRadius: '12px',
-                background: 'rgba(16, 185, 129, 0.08)',
-                border: '1px solid rgba(16, 185, 129, 0.25)',
+                background: '#ecfdf5',
+                border: '1px solid #a7f3d0',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                <Sparkles size={16} color="#10b981" />
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, color: '#34d399' }}>
+                <Sparkles size={16} color="#059669" />
+                <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: '#065f46' }}>
                   Live Notification Connected to Your Phone
                 </h4>
               </div>
-              <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
+              <p style={{ fontSize: '0.78rem', color: '#047857', lineHeight: 1.45 }}>
                 CareSync pushes alerts directly to iOS & Android devices using an open push channel.
                 Open the link below on your phone to subscribe and receive real vibrations & audible alerts!
               </p>
 
               {/* Topic Config Input */}
               <div style={{ marginTop: '0.85rem' }}>
-                <label style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>
+                <label style={{ fontSize: '0.72rem', color: '#065f46', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>
                   YOUR ALERT TOPIC (Click link to subscribe on your phone):
                 </label>
                 <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -223,9 +220,9 @@ export default function CaregiverSnsDrawer({
                       flex: 1,
                       padding: '0.5rem 0.75rem',
                       borderRadius: '8px',
-                      background: 'rgba(0, 0, 0, 0.4)',
-                      border: '1px solid var(--border-card)',
-                      color: '#67e8f9',
+                      background: '#ffffff',
+                      border: '1px solid #a7f3d0',
+                      color: 'var(--text-pure)',
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.82rem',
                     }}
@@ -234,7 +231,7 @@ export default function CaregiverSnsDrawer({
                     href={`https://ntfy.sh/${activeTopic}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="btn-secondary"
+                    className="cs-btn cs-btn-secondary"
                     style={{ padding: '0.5rem 0.75rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
                     title="Open on phone or browser"
                   >
@@ -244,10 +241,10 @@ export default function CaregiverSnsDrawer({
                 </div>
               </div>
 
-              {/* Real Phone Number (Optional AWS SNS SMS) */}
+              {/* Real Phone Number (Optional SMS) */}
               <div style={{ marginTop: '0.75rem' }}>
-                <label style={{ fontSize: '0.72rem', color: 'var(--text-dim)', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>
-                  MOBILE PHONE NUMBER (Optional - For AWS SNS Carrier SMS):
+                <label style={{ fontSize: '0.72rem', color: '#065f46', fontWeight: 600, display: 'block', marginBottom: '0.25rem' }}>
+                  MOBILE PHONE NUMBER (Optional - For Direct SMS):
                 </label>
                 <input
                   type="text"
@@ -258,9 +255,9 @@ export default function CaregiverSnsDrawer({
                     width: '100%',
                     padding: '0.5rem 0.75rem',
                     borderRadius: '8px',
-                    background: 'rgba(0, 0, 0, 0.4)',
-                    border: '1px solid var(--border-card)',
-                    color: '#f8fafc',
+                    background: '#ffffff',
+                    border: '1px solid #a7f3d0',
+                    color: 'var(--text-pure)',
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.82rem',
                   }}
@@ -272,12 +269,12 @@ export default function CaregiverSnsDrawer({
                 type="button"
                 onClick={handleSendTestPush}
                 disabled={isSendingTest}
-                className="btn-primary"
+                className="cs-btn cs-btn-primary"
                 style={{ marginTop: '1rem', width: '100%', justifyContent: 'center', fontSize: '0.88rem' }}
               >
                 {isSendingTest ? (
                   <>
-                    <div className="pulse-dot" style={{ width: '8px', height: '8px', backgroundColor: '#fff' }}></div>
+                    <div className="cs-pulse-dot" style={{ width: '8px', height: '8px', backgroundColor: '#fff' }}></div>
                     <span>Sending Real Alert to Phone...</span>
                   </>
                 ) : (
@@ -294,16 +291,16 @@ export default function CaregiverSnsDrawer({
                     marginTop: '0.75rem',
                     padding: '0.65rem 0.85rem',
                     borderRadius: '8px',
-                    background: 'rgba(16, 185, 129, 0.15)',
-                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    background: '#ffffff',
+                    border: '1px solid #10b981',
                     fontSize: '0.75rem',
-                    color: '#a7f3d0',
+                    color: '#047857',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.4rem',
                   }}
                 >
-                  <Check size={14} color="#10b981" />
+                  <Check size={14} color="#059669" />
                   <span>
                     Delivered! Check your phone on <strong>ntfy.sh/{activeTopic}</strong>
                   </span>
@@ -316,88 +313,87 @@ export default function CaregiverSnsDrawer({
               style={{
                 padding: '0.85rem 1rem',
                 borderRadius: '10px',
-                background: 'rgba(0, 0, 0, 0.3)',
-                border: '1px solid var(--border-subtle)',
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border-default)',
                 fontSize: '0.75rem',
                 color: 'var(--text-muted)',
                 lineHeight: 1.5,
               }}
             >
-              <strong style={{ color: '#f8fafc' }}>📱 How to get alerts on your phone:</strong>
+              <strong style={{ color: 'var(--text-pure)' }}>📱 How to get alerts on your phone:</strong>
               <ol style={{ paddingLeft: '1.25rem', marginTop: '0.35rem' }}>
                 <li>Install <strong>ntfy</strong> from the Apple App Store or Google Play Store (free, no sign-up).</li>
-                <li>Tap <strong>+</strong> and subscribe to topic: <code style={{ color: '#67e8f9' }}>{activeTopic}</code></li>
+                <li>Tap <strong>+</strong> and subscribe to topic: <code style={{ color: '#0284c7' }}>{activeTopic}</code></li>
                 <li>Whenever a dangerous drug clash occurs, your phone rings immediately with priority!</li>
               </ol>
             </div>
           </div>
         )}
 
-        {/* TAB 2: SIMULATED AWS SNS PHONE VIEW */}
+        {/* TAB 2: SIMULATED PHONE VIEW */}
         {activeTab === 'simulated_sms' && (
           <div
             style={{
               flex: 1,
-              background: 'rgba(0, 0, 0, 0.4)',
+              background: 'var(--surface-2)',
               borderRadius: '16px',
-              border: '1px solid var(--border-card)',
+              border: '1px solid var(--border-default)',
               padding: '1.25rem',
               display: 'flex',
               flexDirection: 'column',
               gap: '1rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid var(--border-default)', paddingBottom: '0.75rem' }}>
               <Smartphone size={16} color="var(--text-muted)" />
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Simulated Device: <strong>Alice (Daughter) &bull; {phoneNumber || '+1 (555) 019-2834'}</strong>
+                Simulated Device: <strong style={{ color: 'var(--text-pure)' }}>Alice (Daughter) &bull; {phoneNumber || '+1 (555) 019-2834'}</strong>
               </span>
             </div>
 
             {/* Incoming Message Bubble */}
             <div
               style={{
-                background: 'rgba(239, 68, 68, 0.15)',
-                border: '1px solid rgba(239, 68, 68, 0.35)',
+                background: '#fff1f2',
+                border: '1px solid #fca5a5',
                 borderRadius: '12px',
                 borderTopLeftRadius: '2px',
                 padding: '1rem',
-                color: '#f8fafc',
+                color: 'var(--text-pure)',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.35rem' }}>
-                <ShieldAlert size={14} color="#ef4444" />
-                <strong style={{ fontSize: '0.82rem', color: '#fca5a5' }}>
+                <ShieldAlert size={14} color="#dc2626" />
+                <strong style={{ fontSize: '0.82rem', color: '#991b1b' }}>
                   {currentAlert.subject}
                 </strong>
               </div>
-              <p style={{ fontSize: '0.82rem', lineHeight: 1.45, color: '#fee2e2' }}>
+              <p style={{ fontSize: '0.82rem', lineHeight: 1.45, color: '#7f1d1d' }}>
                 {currentAlert.message}
               </p>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', fontSize: '0.68rem', color: 'var(--text-dim)' }}>
-                <span>AWS SNS &bull; Delivered via SMS</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
-                  <CheckCheck size={12} color="#10b981" /> Delivered
+                <span>Delivered via SMS Notification</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '2px', color: '#059669' }}>
+                  <CheckCheck size={12} color="#059669" /> Delivered
                 </span>
               </div>
             </div>
 
-            {/* AWS SNS Cloud Details */}
+            {/* Details */}
             <div
               style={{
                 marginTop: 'auto',
                 padding: '0.85rem',
                 borderRadius: '8px',
-                background: 'rgba(255, 255, 255, 0.03)',
-                border: '1px solid var(--border-subtle)',
+                background: '#ffffff',
+                border: '1px solid var(--border-default)',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.7rem',
-                color: 'var(--text-dim)',
+                color: 'var(--text-muted)',
               }}
             >
-              <div><strong>Topic ARN:</strong> {currentAlert.topic_arn}</div>
+              <div><strong>Topic:</strong> {currentAlert.topic_arn}</div>
               <div style={{ marginTop: '0.25rem' }}><strong>Timestamp:</strong> {currentAlert.timestamp}</div>
-              <div style={{ marginTop: '0.25rem' }}><strong>Simulated Service:</strong> LocalStack SNS Port 4566</div>
             </div>
           </div>
         )}
@@ -405,7 +401,7 @@ export default function CaregiverSnsDrawer({
         <button
           type="button"
           onClick={onClose}
-          className="btn-secondary"
+          className="cs-btn cs-btn-secondary"
           style={{ marginTop: '1.25rem', width: '100%', justifyContent: 'center' }}
         >
           Close Drawer
@@ -414,4 +410,5 @@ export default function CaregiverSnsDrawer({
     </div>
   );
 }
+
 

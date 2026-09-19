@@ -18,17 +18,17 @@ export function CareSyncProvider({ children }) {
   const [isLiveBackend, setIsLiveBackend] = useState(false);
   const [isSnsDrawerOpen, setIsSnsDrawerOpen] = useState(false);
   const [isTraceModalOpen, setIsTraceModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('schedule'); // 'schedule' | 'intake' | 'security' | 'alerts' | 'telemetry'
+  const [activeTab, setActiveTab] = useState('home'); // 'home' | 'schedule' | 'intake' | 'security' | 'alerts' | 'telemetry'
 
   // Sync activeTab with URL hash for deep linking and browser history
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#/', '').replace('#', '');
-      const validTabs = ['schedule', 'intake', 'security', 'alerts', 'telemetry'];
+      const validTabs = ['home', 'schedule', 'intake', 'security', 'alerts', 'telemetry'];
       if (validTabs.includes(hash)) {
         setActiveTab(hash);
       } else if (!hash) {
-        window.location.hash = '#/schedule';
+        window.location.hash = '#/home';
       }
     };
 

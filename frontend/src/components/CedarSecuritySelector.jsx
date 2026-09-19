@@ -9,9 +9,9 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
       relation: 'Daughter / Primary Caregiver',
       status: 'PERMITTED',
       icon: UserCheck,
-      color: '#10b981',
+      color: '#059669',
       badgeClass: 'cs-badge-emerald',
-      rule: 'In resource.authorized_family',
+      rule: 'In authorized_family',
     },
     {
       id: 'User::Charlie',
@@ -19,24 +19,24 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
       relation: 'Son / Secondary Contact',
       status: 'PERMITTED',
       icon: UserCheck,
-      color: '#10b981',
+      color: '#059669',
       badgeClass: 'cs-badge-emerald',
-      rule: 'In resource.authorized_family',
+      rule: 'In authorized_family',
     },
     {
       id: 'User::Eve',
       name: 'Eve',
-      relation: 'Unauthorized Stranger',
+      relation: 'Unauthorized External',
       status: 'DENIED',
       icon: UserX,
-      color: '#ef4444',
+      color: '#dc2626',
       badgeClass: 'cs-badge-crimson',
-      rule: 'NotIn authorized_family -> 403',
+      rule: 'Not in authorized_family',
     },
   ];
 
   return (
-    <section className="cs-card" style={{ padding: '1.4rem' }} aria-label="Cedar Zero-Trust Security Gate">
+    <section className="cs-card" style={{ padding: '1.4rem', background: 'var(--surface-1)', border: '1px solid var(--border-default)' }} aria-label="Security Access Control Gate">
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
@@ -45,21 +45,21 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
               width: '32px',
               height: '32px',
               borderRadius: '8px',
-              background: 'var(--cyan-subtle)',
-              border: '1px solid rgba(8, 145, 178, 0.3)',
+              background: '#ecfdf5',
+              border: '1px solid #a7f3d0',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Lock size={16} color="#06b6d4" />
+            <Lock size={16} color="#059669" />
           </div>
           <div>
             <h2 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-pure)' }}>
-              Zero-Trust Cedar Authorization Gate
+              Family Access & Security Gate
             </h2>
             <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-              Evaluated in sub-millisecond Rust execution via <code>cedarpy</code>
+              Role-based verification of caregiver permissions and patient privacy scope
             </p>
           </div>
         </div>
@@ -70,9 +70,10 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
             fontFamily: 'var(--font-mono)',
             padding: '0.25rem 0.6rem',
             borderRadius: '6px',
-            background: 'rgba(0, 0, 0, 0.4)',
-            border: '1px solid var(--border-subtle)',
-            color: '#38bdf8',
+            background: 'var(--surface-2)',
+            border: '1px solid var(--border-default)',
+            color: 'var(--primary-dark)',
+            fontWeight: 600,
           }}
         >
           Scope: Patient::{patientId}
@@ -98,15 +99,15 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
                 borderRadius: 'var(--radius-sm)',
                 background: isSelected
                   ? isPermitted
-                    ? 'rgba(5, 150, 105, 0.14)'
-                    : 'rgba(220, 38, 38, 0.14)'
-                  : 'rgba(0, 0, 0, 0.28)',
+                    ? '#ecfdf5'
+                    : '#fef2f2'
+                  : 'var(--surface-1)',
                 border: `1.5px solid ${
                   isSelected
                     ? isPermitted
-                      ? 'rgba(16, 185, 129, 0.5)'
-                      : 'rgba(239, 68, 68, 0.5)'
-                    : 'var(--border-subtle)'
+                      ? '#10b981'
+                      : '#ef4444'
+                    : 'var(--border-default)'
                 }`,
                 display: 'flex',
                 flexDirection: 'column',
@@ -117,7 +118,7 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
                   <Icon size={16} color={u.color} />
-                  <span style={{ fontWeight: 700, fontSize: '0.88rem', color: isSelected ? '#ffffff' : 'var(--text-main)' }}>
+                  <span style={{ fontWeight: 700, fontSize: '0.88rem', color: 'var(--text-pure)' }}>
                     {u.name}
                   </span>
                 </div>
@@ -145,11 +146,11 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
           marginTop: '0.9rem',
           padding: '0.65rem 0.9rem',
           borderRadius: '8px',
-          background: 'rgba(0, 0, 0, 0.45)',
-          border: '1px solid var(--border-subtle)',
+          background: 'var(--surface-2)',
+          border: '1px solid var(--border-default)',
           fontFamily: 'var(--font-mono)',
           fontSize: '0.72rem',
-          color: '#cbd5e1',
+          color: 'var(--text-pure)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -158,12 +159,13 @@ export default function CedarSecuritySelector({ selectedUser, setSelectedUser, p
         }}
       >
         <span>
-          <span style={{ color: '#10b981', fontWeight: 600 }}>permit</span>(principal, action == Action::<span style={{ color: '#38bdf8' }}>"ViewPatientRecord"</span>, resource) <span style={{ color: '#a78bfa' }}>when</span> {'{'} principal <span style={{ color: '#f59e0b' }}>in</span> resource.authorized_family {'}'};
+          <span style={{ color: '#059669', fontWeight: 600 }}>permit</span>(principal, action == Action::<span style={{ color: '#0284c7' }}>"ViewPatientRecord"</span>, resource) <span style={{ color: '#7c3aed' }}>when</span> {'{'} principal <span style={{ color: '#d97706' }}>in</span> resource.authorized_family {'}'};
         </span>
         <span style={{ color: 'var(--text-dim)', fontSize: '0.68rem', letterSpacing: '0.04em' }}>
-          policies.cedar
+          Access Policy Rule
         </span>
       </div>
     </section>
   );
 }
+

@@ -26,9 +26,9 @@ Resources:
   CareSyncFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: app/
-      Handler: main.lambda_handler
-      Runtime: python3.11
+      CodeUri: dist/
+      Handler: main.lambdaHandler
+      Runtime: nodejs20.x
       Events:
         ProcessNote:
           Type: Api
@@ -54,6 +54,12 @@ Resources:
             RestApiId: !Ref CareSyncApi
             Path: /alerts
             Method: get
+        PostNotify:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CareSyncApi
+            Path: /notify
+            Method: post
 
   # Local Cloud Resources
   EmergencyAlertTopic:
