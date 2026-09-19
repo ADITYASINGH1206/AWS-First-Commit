@@ -106,18 +106,31 @@ export default function VoiceNoteRecorder({ doctorsNote, setDoctorsNote, onProce
           </button>
         ))}
 
-        {doctorsNote && (
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.4rem' }}>
+          {doctorsNote && (
+            <button
+              type="button"
+              className="cs-btn cs-btn-secondary"
+              onClick={() => handlePlayVoice(doctorsNote)}
+              style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem' }}
+              title="Read current dictation aloud"
+            >
+              <Volume2 size={14} color="#0284c7" />
+              <span>Hear Audio</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="cs-btn cs-btn-secondary"
-            onClick={() => handlePlayVoice(doctorsNote)}
-            style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem', marginLeft: 'auto' }}
-            title="Read current dictation aloud"
+            onClick={() => setDoctorsNote('')}
+            style={{ fontSize: '0.78rem', padding: '0.4rem 0.75rem' }}
+            title="Clear current clinical note"
           >
-            <Volume2 size={14} color="#0284c7" />
-            <span>Hear Audio</span>
+            <RotateCcw size={13} />
+            <span>Clear</span>
           </button>
-        )}
+        </div>
       </div>
 
       {/* Clinical Text Area */}

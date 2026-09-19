@@ -69,6 +69,97 @@ export async function sendRealTestNotification(topic, title, message, phoneNumbe
   }
 }
 
+export async function fetchPatients() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/patients`);
+    const data = await res.json();
+    if (data.patients) {
+      localStorage.setItem('caresync_cached_patients', JSON.stringify(data.patients));
+      return data.patients;
+    }
+  } catch (err) {
+    console.warn('Backend offline, using cached patients from localStorage:', err);
+  }
+  const cached = localStorage.getItem('caresync_cached_patients');
+  if (cached) {
+    try {
+      return JSON.parse(cached);
+    } catch (e) {}
+  }
+  return {
+    Grandma_Bob: {
+      name: "Roberta 'Grandma' Bob",
+      age: 78,
+      authorized_family: ["User::Alice", "User::Charlie"],
+      current_medications: ["Lisinopril 10mg"],
+      allergies: ["Penicillin"],
+      notes: "Mild hypertension, chronic knee osteoarthritis",
+    },
+    Grandpa_Arthur: {
+      name: "Arthur Pendelton",
+      age: 82,
+      authorized_family: ["User::David"],
+      current_medications: ["Warfarin 5mg"],
+      allergies: ["Sulfa"],
+      notes: "Atrial fibrillation, fall risk",
+    },
+  };
+}
+
+export async function addPatientMedication(patientId, medication) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/patients/medications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: patientId, medication }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Backend offline for addMedication:', err);
+    return { status: 'success', local: true };
+  }
+}
+
+export async function removePatientMedication(patientId, medication) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/patients/medications/remove`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: patientId, medication }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Backend offline for removeMedication:', err);
+    return { status: 'success', local: true };
+  }
+}
+
+export async function savePatientData(patientId, patientData) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/patients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ patient_id: patientId, ...patientData }),
+    });
+    return await res.json();
+  } catch (err) {
+    console.warn('Backend offline for savePatientData:', err);
+    return { status: 'success', local: true };
+  }
+}
+
+export async function fetchAdherence(patientId) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/adherence?patient_id=${encodeURIComponent(patientId)}`);
+    const data = await res.json();
+    return data.adherence_logs || {};
+  } catch (err) {
+    console.warn('Backend offline for fetchAdherence:', err);
+    const local = localStorage.getItem(`caresync_adh_${patientId}`);
+    return local ? JSON.parse(local) : {};
+  }
+}
+
 export async function updateAdherence(patientId, slot, medication, status) {
   try {
     const res = await fetch(`${API_BASE_URL}/adherence`, {
@@ -79,6 +170,21 @@ export async function updateAdherence(patientId, slot, medication, status) {
     return await res.json();
   } catch (err) {
     return { status: 'success', simulated: true, slot, medication, new_status: status };
+  }
+}
+
+export async function resetDatabase() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/reset-db`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    localStorage.removeItem('caresync_cached_patients');
+    return await res.json();
+  } catch (err) {
+    console.warn('Backend offline for reset-db:', err);
+    localStorage.clear();
+    return { status: 'success', message: 'Local cache cleared' };
   }
 }
 

@@ -1,17 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCareSync } from '../context/CareSyncContext';
 import PillScheduleBoard from '../components/PillScheduleBoard';
 import ConflictAlertBanner from '../components/ConflictAlertBanner';
-import { User, CheckCircle2, ShieldAlert, ArrowRight, Activity, CalendarDays } from 'lucide-react';
+import ManageMedicationsModal from '../components/ManageMedicationsModal';
+import {
+  User,
+  CheckCircle2,
+  ShieldAlert,
+  ArrowRight,
+  Activity,
+  CalendarDays,
+  Pill,
+  Plus,
+  Trash2,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 export default function SchedulePage() {
   const {
     patientId,
+    setPatientId,
+    patients,
     resultData,
     forbiddenError,
     isLoading,
+    adherenceLogs,
     handleAdherenceUpdate,
     setIsSnsDrawerOpen,
+    removeCustomMedication,
+    isMedManagerOpen,
+    setIsMedManagerOpen,
     navigateTo,
   } = useCareSync();
 
@@ -27,11 +45,21 @@ export default function SchedulePage() {
             </h1>
           </div>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Daily pill regimen organized across Morning, Afternoon, Evening, and Bedtime slots with real-time adherence tracking.
+            Persistent daily pill regimen organized across Morning, Afternoon, Evening, and Bedtime slots with real-time adherence tracking.
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.65rem' }}>
+        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+          <button
+            type="button"
+            onClick={() => setIsMedManagerOpen(true)}
+            className="cs-btn cs-btn-primary"
+            style={{ fontSize: '0.84rem' }}
+          >
+            <SlidersHorizontal size={14} />
+            <span>Customize Regimen & DB</span>
+          </button>
+
           <button
             type="button"
             onClick={() => navigateTo('intake')}
@@ -135,8 +163,60 @@ export default function SchedulePage() {
                   </span>
                 </div>
                 <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                  Active Maintenance Regimen: <strong style={{ color: 'var(--text-pure)' }}>{resultData.current_medications?.join(', ') || 'None'}</strong>
+                  Active Maintenance Regimen:
                 </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
+                  {resultData.current_medications && resultData.current_medications.length > 0 ? (
+                    resultData.current_medications.map((med, idx) => (
+                      <span
+                        key={idx}
+                        className="cs-badge cs-badge-slate"
+                        style={{
+                          fontSize: '0.78rem',
+                          padding: '0.25rem 0.55rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                        }}
+                      >
+                        <Pill size={12} color="var(--primary)" />
+                        <span>{med}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeCustomMedication(med)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            padding: 0,
+                            cursor: 'pointer',
+                            color: 'var(--text-dim)',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                          title={`Remove ${med}`}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </span>
+                    ))
+                  ) : (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>No medications listed</span>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setIsMedManagerOpen(true)}
+                    className="cs-btn cs-btn-secondary"
+                    style={{
+                      fontSize: '0.74rem',
+                      padding: '0.25rem 0.6rem',
+                      borderRadius: '12px',
+                    }}
+                  >
+                    <Plus size={12} />
+                    <span>Add Medication</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -160,10 +240,17 @@ export default function SchedulePage() {
             onOpenSnsDrawer={() => setIsSnsDrawerOpen(true)}
           />
 
-          {/* Daily Chronotherapy Pill Schedule */}
+          {/* Daily Chronotherapy Pill Schedule with Persistent Adherence */}
           <PillScheduleBoard
             schedule={resultData.daily_schedule}
             onUpdateAdherence={handleAdherenceUpdate}
+            adherenceLogs={adherenceLogs}
+          />
+
+          {/* Modal for Managing Custom Medications and Patients */}
+          <ManageMedicationsModal
+            isOpen={isMedManagerOpen}
+            onClose={() => setIsMedManagerOpen(false)}
           />
         </>
       )}

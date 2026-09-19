@@ -5,23 +5,8 @@
  * checking, and daily chronotherapy schedule synthesis.
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { getPatient, getPatients, getInteractions } from './db.js';
 import type { DailySchedule, DrugInteractionInfo, InteractionWarning, PatientRecord } from './types.js';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const MOCK_DB_PATH = path.join(__dirname, 'mockDb.json');
-
-function loadMockDb(): { patients: Record<string, PatientRecord>; interactions: Record<string, DrugInteractionInfo> } {
-  try {
-    const data = fs.readFileSync(MOCK_DB_PATH, 'utf-8');
-    return JSON.parse(data);
-  } catch (err: any) {
-    return { patients: {}, interactions: {} };
-  }
-}
 
 /**
  * Fetches existing medications and clinical profile for the patient.
@@ -34,13 +19,10 @@ export function fetchPatientHistory(patientId: string): {
   authorized_family?: string[];
   error?: string;
 } {
-  const db = loadMockDb();
-  const patients = db.patients || {};
-
   const targetId = patientId.replace('Patient::', '').trim();
+  const record = getPatient(targetId);
 
-  if (patients[targetId]) {
-    const record = patients[targetId];
+  if (record) {
     return {
       patient_id: targetId,
       name: record.name || targetId,
@@ -49,6 +31,8 @@ export function fetchPatientHistory(patientId: string): {
       authorized_family: record.authorized_family || [],
     };
   }
+
+  const patients = getPatients();
 
   // Case-insensitive lookup fallback
   for (const [pid, data] of Object.entries(patients)) {
@@ -94,8 +78,7 @@ export function checkDrugInteraction(
   details: string;
   conflicts: InteractionWarning[];
 } {
-  const db = loadMockDb();
-  const interactions = db.interactions || {};
+  const interactions = getInteractions() || {};
   const conflictsDetected: InteractionWarning[] = [];
 
   const newMedsList = Array.isArray(newMeds) ? newMeds : [newMeds];

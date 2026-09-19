@@ -3,17 +3,30 @@
     "Grandma_Bob": {
       "name": "Roberta 'Grandma' Bob",
       "age": 78,
-      "authorized_family": ["User::Alice", "User::Charlie"],
-      "current_medications": ["Lisinopril 10mg"],
-      "allergies": ["Penicillin"],
+      "authorized_family": [
+        "User::Alice",
+        "User::Charlie"
+      ],
+      "current_medications": [
+        "Lisinopril 10mg"
+      ],
+      "allergies": [
+        "Penicillin"
+      ],
       "notes": "Mild hypertension, chronic knee osteoarthritis"
     },
     "Grandpa_Arthur": {
       "name": "Arthur Pendelton",
       "age": 82,
-      "authorized_family": ["User::David"],
-      "current_medications": ["Warfarin 5mg"],
-      "allergies": ["Sulfa"],
+      "authorized_family": [
+        "User::David"
+      ],
+      "current_medications": [
+        "Warfarin 5mg"
+      ],
+      "allergies": [
+        "Sulfa"
+      ],
       "notes": "Atrial fibrillation, fall risk"
     }
   },
@@ -38,5 +51,21 @@
       "warning": "Potential life-threatening Serotonin Syndrome.",
       "clinical_guidance": "Dual serotonergic reuptake and release leads to excessive CNS serotonin stimulation."
     }
-  }
+  },
+  "adherence": {},
+  "alerts": [
+    {
+      "alert_id": "sns-1789814541438",
+      "timestamp": "2026-09-19T10:42:21.438Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg",
+        "Ibuprofen 400mg"
+      ],
+      "subject": "URGENT: Adverse Drug Conflict for Grandma_Bob",
+      "message": "CareSync Safety Alert: High-risk drug interaction detected for Grandma_Bob. Warning: May decrease kidney function and reduce BP control.. Immediate clinical review advised."
+    }
+  ]
 }
