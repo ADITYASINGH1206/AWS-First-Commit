@@ -437,11 +437,11 @@ export default function HomePage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <Smartphone size={20} color="var(--danger)" />
               <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-pure)' }}>
-                Emergency Caregiver Alerts
+                Emergency Caregiver Alerts & Escalation
               </h3>
             </div>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
-              Sends instant push notifications directly to family members' mobile phones when high-risk drug interactions are identified.
+              Sends instant push notifications directly to family members' mobile phones when high-risk drug interactions or missed doses occur.
             </p>
             <button
               type="button"
@@ -450,6 +450,51 @@ export default function HomePage() {
               style={{ fontSize: '0.84rem', width: '100%', justifyContent: 'center' }}
             >
               <span>Test Phone Alerts</span>
+              <ArrowRight size={14} />
+            </button>
+          </div>
+
+          {/* Card 4: Clinical RAG FDA Knowledge Engine */}
+          <div className="cs-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <div
+              style={{
+                borderRadius: '12px',
+                height: '220px',
+                marginBottom: '1.25rem',
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#38bdf8',
+                padding: '1.5rem',
+                textAlign: 'center',
+              }}
+            >
+              <Activity size={48} strokeWidth={2.2} style={{ marginBottom: '0.75rem' }} />
+              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff' }}>
+                openFDA Live Drug Monograph API
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '0.35rem' }}>
+                Real-time Black Box Warnings & Geriatric Precautions
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+              <Activity size={20} color="var(--primary)" />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+                Clinical RAG & FDA Safety
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
+              Retrieval-Augmented Generation grounds patient regimens against live FDA Structured Product Labels (SPL) and DailyMed monographs.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigateTo('fda-rag')}
+              className="cs-btn cs-btn-primary"
+              style={{ fontSize: '0.84rem', width: '100%', justifyContent: 'center' }}
+            >
+              <span>Explore Clinical RAG</span>
               <ArrowRight size={14} />
             </button>
           </div>

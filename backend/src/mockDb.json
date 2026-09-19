@@ -55,6 +55,69 @@
   "adherence": {},
   "alerts": [
     {
+      "alert_id": "sns-1789815697256",
+      "timestamp": "2026-09-19T11:01:37.256Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg",
+        "Ibuprofen 400mg"
+      ],
+      "subject": "URGENT: Adverse Drug Conflict for Grandma_Bob",
+      "message": "CareSync Safety Alert: High-risk drug interaction detected for Grandma_Bob. Warning: May decrease kidney function and reduce BP control.. Immediate clinical review advised."
+    },
+    {
+      "alert_id": "esc-2-1789815528972",
+      "timestamp": "2026-09-19T10:58:48.972Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-adherence-escalation",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg"
+      ],
+      "subject": "🚨 TIER 2 ADHERENCE ESCALATION: Grandma_Bob",
+      "message": "[Escalation Tier 2] Missed Morning medication dose: Lisinopril 10mg for Grandma_Bob. Immediate caregiver confirmation required."
+    },
+    {
+      "alert_id": "sns-1789815514728",
+      "timestamp": "2026-09-19T10:58:34.728Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg",
+        "Ibuprofen 400mg"
+      ],
+      "subject": "URGENT: Adverse Drug Conflict for Grandma_Bob",
+      "message": "CareSync Safety Alert: High-risk drug interaction detected for Grandma_Bob. Warning: May decrease kidney function and reduce BP control.. Immediate clinical review advised."
+    },
+    {
+      "alert_id": "esc-2-1789815285152",
+      "timestamp": "2026-09-19T10:54:45.152Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-adherence-escalation",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg"
+      ],
+      "subject": "🚨 TIER 2 ADHERENCE ESCALATION: Grandma_Bob",
+      "message": "[Escalation Tier 2] Missed Morning medication dose: Lisinopril 10mg for Grandma_Bob. Immediate caregiver confirmation required."
+    },
+    {
+      "alert_id": "sns-1789815263021",
+      "timestamp": "2026-09-19T10:54:23.021Z",
+      "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",
+      "patient_id": "Grandma_Bob",
+      "severity": "High",
+      "drugs": [
+        "Lisinopril 10mg",
+        "Ibuprofen 400mg"
+      ],
+      "subject": "URGENT: Adverse Drug Conflict for Grandma_Bob",
+      "message": "CareSync Safety Alert: High-risk drug interaction detected for Grandma_Bob. Warning: May decrease kidney function and reduce BP control.. Immediate clinical review advised."
+    },
+    {
       "alert_id": "sns-1789814541438",
       "timestamp": "2026-09-19T10:42:21.438Z",
       "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",

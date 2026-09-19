@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Volume2, Sparkles, FileText, Play, RotateCcw, Stethoscope } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Volume2, Sparkles, FileText, Play, RotateCcw, Stethoscope, Mic, MicOff } from 'lucide-react';
 
 const SAMPLES = [
   {
@@ -20,6 +20,63 @@ const SAMPLES = [
 
 export default function VoiceNoteRecorder({ doctorsNote, setDoctorsNote, onProcess, isLoading }) {
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [isRecordingMic, setIsRecordingMic] = useState(false);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognizer = new SpeechRecognition();
+      recognizer.continuous = true;
+      recognizer.interimResults = true;
+      recognizer.lang = 'en-US';
+
+      recognizer.onresult = (event) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript + ' ';
+        }
+        if (transcript.trim()) {
+          setDoctorsNote(transcript.trim());
+        }
+      };
+
+      recognizer.onerror = (err) => {
+        console.warn('Speech recognition error:', err);
+        setIsRecordingMic(false);
+      };
+
+      recognizer.onend = () => {
+        setIsRecordingMic(false);
+      };
+
+      recognitionRef.current = recognizer;
+    }
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort();
+      }
+    };
+  }, [setDoctorsNote]);
+
+  const toggleMicRecording = () => {
+    if (!recognitionRef.current) {
+      alert('Live speech recognition is not supported in this browser. Please type or select a clinical preset.');
+      return;
+    }
+
+    if (isRecordingMic) {
+      recognitionRef.current.stop();
+      setIsRecordingMic(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsRecordingMic(true);
+      } catch (e) {
+        console.warn('Recognition start error:', e);
+      }
+    }
+  };
 
   const handlePlayVoice = (textToSpeak) => {
     if ('speechSynthesis' in window) {
@@ -66,13 +123,20 @@ export default function VoiceNoteRecorder({ doctorsNote, setDoctorsNote, onProce
               Doctor Voice Dictation Ingestion
             </h2>
             <p style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
-              Speech-to-text dictation input & automated clinical extraction
+              Live microphone speech-to-text dictation & automated clinical extraction
             </p>
           </div>
         </div>
 
-        {/* Audio Waveform Simulator */}
-        {isPlayingAudio && (
+        {/* Live Mic Indicator / Audio Waveform Simulator */}
+        {isRecordingMic ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#fff1f2', border: '1px solid #fecdd3', padding: '0.25rem 0.6rem', borderRadius: '6px' }}>
+            <span className="cs-pulse-dot" style={{ backgroundColor: 'var(--danger)' }}></span>
+            <span style={{ fontSize: '0.74rem', color: 'var(--danger)', fontWeight: 700 }}>
+              Live Microphone Listening...
+            </span>
+          </div>
+        ) : isPlayingAudio ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '0.25rem 0.6rem', borderRadius: '6px' }}>
             <span style={{ fontSize: '0.72rem', color: '#059669', fontWeight: 600 }}>
               Synthesized Voice Note Playing...
@@ -85,11 +149,29 @@ export default function VoiceNoteRecorder({ doctorsNote, setDoctorsNote, onProce
               <div className="waveform-bar" style={{ animationDelay: '0.4s', background: '#059669' }}></div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {/* Preset Quick-Load Samples */}
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+      {/* Preset Quick-Load Samples & Live Mic Trigger */}
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.85rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        {/* Live Mic Toggle Button */}
+        <button
+          type="button"
+          className="cs-btn"
+          onClick={toggleMicRecording}
+          style={{
+            fontSize: '0.78rem',
+            padding: '0.4rem 0.8rem',
+            background: isRecordingMic ? 'var(--danger)' : 'var(--primary-subtle)',
+            color: isRecordingMic ? '#ffffff' : 'var(--primary)',
+            borderColor: isRecordingMic ? 'var(--danger)' : '#a7f3d0',
+          }}
+          title={isRecordingMic ? 'Stop Microphone' : 'Start Live Microphone Dictation'}
+        >
+          {isRecordingMic ? <MicOff size={14} /> : <Mic size={14} />}
+          <span>{isRecordingMic ? 'Stop Recording' : 'Live Mic Dictate'}</span>
+        </button>
+
         {SAMPLES.map((s, idx) => (
           <button
             key={idx}

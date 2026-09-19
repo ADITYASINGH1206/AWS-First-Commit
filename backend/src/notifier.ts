@@ -39,13 +39,17 @@ export async function sendNtfyPush(
   };
   const prioVal = prioMap[priority] || '4';
 
+  // Node.js fetch requires ByteString (ASCII <= 255) for HTTP headers
+  const safeTitle = title.replace(/[^\x00-\x7F]/g, '').trim() || 'CareSync Alert';
+  const safeTags = tags.map((t) => t.replace(/[^\x00-\x7F]/g, '')).filter(Boolean);
+
   try {
     const resp = await fetch(url, {
       method: 'POST',
       headers: {
-        Title: title,
+        Title: safeTitle,
         Priority: prioVal,
-        Tags: tags.join(','),
+        Tags: safeTags.join(','),
       },
       body: message,
     });
