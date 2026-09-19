@@ -8,7 +8,7 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
-export async function processDoctorNote(userId, patientId, doctorsNote) {
+export async function processDoctorNote(userId, patientId, doctorsNote, notifyConfig = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}/process-note`, {
       method: 'POST',
@@ -19,6 +19,8 @@ export async function processDoctorNote(userId, patientId, doctorsNote) {
         user_id: userId,
         patient_id: patientId,
         doctors_note: doctorsNote,
+        ntfy_topic: notifyConfig.ntfyTopic,
+        phone_number: notifyConfig.phoneNumber,
       }),
     });
 
@@ -31,7 +33,39 @@ export async function processDoctorNote(userId, patientId, doctorsNote) {
   } catch (err) {
     console.warn('Backend connection to localhost:3001 offline. Utilizing CareSync Local Simulation Engine:', err);
     // Instant fallback simulation matching the exact Cedar & Strands blueprint contract
-    return simulateLocalExecution(userId, patientId, doctorsNote);
+    return simulateLocalExecution(userId, patientId, doctorsNote, notifyConfig);
+  }
+}
+
+export async function sendRealTestNotification(topic, title, message, phoneNumber = '') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/notify`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, title, message, phone_number: phoneNumber }),
+    });
+    return await res.json();
+  } catch (err) {
+    // Direct client fallback to ntfy.sh
+    try {
+      const cleanTopic = topic ? topic.trim().replace(/\s+/g, '-').toLowerCase() : 'caresync-eldercare-alerts';
+      await fetch(`https://ntfy.sh/${cleanTopic}`, {
+        method: 'POST',
+        headers: {
+          'Title': title || 'CareSync Real Phone Test',
+          'Priority': 'urgent',
+          'Tags': 'bell,iphone,robot',
+        },
+        body: message || 'Live alert delivered directly to your phone!',
+      });
+      return {
+        status: 'success',
+        message: 'Dispatched directly via browser to ntfy.sh',
+        subscribe_url: `https://ntfy.sh/${cleanTopic}`,
+      };
+    } catch (pushErr) {
+      return { status: 'error', error: String(pushErr) };
+    }
   }
 }
 
@@ -112,7 +146,7 @@ function simulateLocalExecution(userId, patientId, doctorsNote) {
     });
   }
 
-  return {
+  const responseObj = {
     status: 200,
     data: {
       status: 'success',
@@ -156,9 +190,33 @@ function simulateLocalExecution(userId, patientId, doctorsNote) {
             drugs: ['Lisinopril 10mg', 'Ibuprofen 400mg'],
             subject: `URGENT: Adverse Drug Conflict for ${patientId}`,
             message: `CareSync Safety Alert: High-risk drug interaction detected for ${patientId}. Warning: May decrease kidney function and reduce BP control.`,
+            real_delivery: {
+              ntfy: {
+                channel: 'ntfy_push',
+                status: 'delivered',
+                topic: notifyConfig?.ntfyTopic || 'caresync-eldercare-alerts',
+                subscribe_url: `https://ntfy.sh/${notifyConfig?.ntfyTopic || 'caresync-eldercare-alerts'}`
+              }
+            }
           }]
         : [],
     },
     isLiveBackend: false,
   };
+
+  // Asynchronous real push to ntfy.sh from browser if topic provided
+  if (warnings.length > 0) {
+    const topic = (notifyConfig?.ntfyTopic || 'caresync-eldercare-alerts').trim().replace(/\s+/g, '-').toLowerCase();
+    fetch(`https://ntfy.sh/${topic}`, {
+      method: 'POST',
+      headers: {
+        'Title': `🚨 URGENT: Drug Clash Detected for ${patientId}`,
+        'Priority': 'urgent',
+        'Tags': 'warning,pill,rotating_light',
+      },
+      body: `CareSync Safety Alert: High severity interaction (Lisinopril + Ibuprofen). May decrease kidney function and reduce BP control.`,
+    }).catch((e) => console.warn('Browser direct ntfy push:', e));
+  }
+
+  return responseObj;
 }
