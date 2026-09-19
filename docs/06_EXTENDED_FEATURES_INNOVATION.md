@@ -31,12 +31,14 @@ To demonstrate technical mastery of cloud architecture and deliver exceptional v
 
 ---
 
-## Feature 2: Real-Time Emergency Caregiver Alert System (Simulated Amazon SNS)
-- **AWS Service Emulated:** Amazon Simple Notification Service (SNS).
-- **Description:** When an adverse drug interaction of `High` or `Critical` severity is detected, the Lambda handler publishes an urgent notification payload to an SNS topic.
+## Feature 2: Real-Time Emergency Caregiver Alert System (Real Mobile Push + AWS SNS)
+- **AWS Service Emulated & Real Integration:** Amazon Simple Notification Service (SNS) + Live Mobile Push via ntfy.sh.
+- **Description:** When an adverse drug interaction of `High` or `Critical` severity is detected, CareSync immediately dispatches real notifications directly to caregiver mobile phones in addition to simulated SNS topic logs.
 - **Interactive Capabilities:**
-  - Caregivers receive an immediate visual alert drawer.
-  - Simulates the exact SMS message dispatched to registered family phone numbers.
+  - **Live Phone Push (iOS & Android):** Zero-configuration push notifications via ntfy.sh. Caregivers subscribe to `https://ntfy.sh/<topic>` on their phone (via free app or web) to receive audible alerts and vibrations.
+  - **Live Carrier SMS (Optional AWS Mode):** When live AWS credentials and a verified phone number are provided, dispatches live SMS messages through Amazon SNS (`boto3.client('sns')`).
+  - **Simulated AWS SNS Drawer:** Interactive UI drawer displaying simulated SMS payloads, message timestamps, and LocalStack SNS topic ARNs.
+  - **Immediate Test Dispatch:** "Send Live Test Alert to My Phone" button allowing judges to verify real-time phone alerts instantly.
 
 ---
 
@@ -56,3 +58,18 @@ To demonstrate technical mastery of cloud architecture and deliver exceptional v
 - **Interactive Capabilities:**
   - Toggle between `Alice` (Authorized Daughter, 200 OK) and `Eve` (Unauthorized Stranger, 403 Forbidden).
   - Displays Cedar policy syntax and evaluation execution metrics.
+
+---
+
+## 5. Architectural Analysis: Mock vs. Real Subsystems
+
+| Subsystem / Feature | Current Implementation Status | Real vs. Mock Mechanism |
+| :--- | :--- | :--- |
+| **Cedar Policy Engine** | **REAL / LIVE** | Uses real AWS Cedar open-source engine via `cedarpy` (Rust-compiled). Formally parses and evaluates `policies.cedar`. |
+| **Strands Agents SDK** | **REAL / LIVE** | Uses AWS's official `strands-agents` package with `@tool` schema decorators and execution loops. |
+| **Local LLM Engine** | **REAL (Dual-Mode)** | Directly connects to local **Ollama** (`llama3`) on `localhost:11434`, with deterministic parser fallback when offline. |
+| **Serverless Lambda & API** | **REAL AWS SAM CONTRACT** | Handled by `backend/app/main.py` matching standard API Gateway proxy integration. |
+| **Mobile Phone Notifications** | **REAL / LIVE** | Dispatches live push alerts to phones via **ntfy.sh** + optional real AWS SNS SMS via `boto3`. |
+| **Patient & Prescription DB** | **MOCK (File-backed)** | Stored in `mock_db.json` simulating Amazon DynamoDB / EHR database per hackathon specifications. |
+| **Adherence State Store** | **MOCK (In-memory)** | Emulates DynamoDB table `caresync-adherence-tracker` with slot timestamps. |
+| **Doctor Audio Memo** | **SIMULATED (Speech API)** | Browser SpeechSynthesis API & audio player simulating Amazon Transcribe / Whisper. |

@@ -9,14 +9,16 @@ import json
 import logging
 import os
 import time
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 try:
     from app.cedar_auth import evaluate_authorization
     from app.agent import default_agent
+    from app.notifier import dispatch_multi_channel_emergency_alert, send_ntfy_push
 except ImportError:
     from cedar_auth import evaluate_authorization
     from agent import default_agent
+    from notifier import dispatch_multi_channel_emergency_alert, send_ntfy_push
 
 logger = logging.getLogger("caresync_lambda")
 logger.setLevel(logging.INFO)
@@ -46,23 +48,38 @@ def _create_response(status_code: int, body_dict: Dict[str, Any]) -> Dict[str, A
     }
 
 
-def _dispatch_sns_emergency_alert(patient_id: str, conflict_warning: Dict[str, Any]) -> Dict[str, Any]:
-    """Simulate Amazon SNS alert dispatch to caregivers."""
+def _dispatch_sns_emergency_alert(
+    patient_id: str,
+    conflict_warning: Dict[str, Any],
+    ntfy_topic: Optional[str] = None,
+    phone_number: Optional[str] = None
+) -> Dict[str, Any]:
+    """Dispatch emergency alert across both simulated SNS and real mobile push/SMS channels."""
+    dispatch_result = dispatch_multi_channel_emergency_alert(
+        patient_id=patient_id,
+        conflict_warning=conflict_warning,
+        ntfy_topic=ntfy_topic,
+        phone_number=phone_number
+    )
+    simulated_receipt = dispatch_result["receipts"].get("simulated_sns", {})
+
+    # Combine receipts with backward-compatible format
     alert_event = {
-        "alert_id": f"sns-{int(time.time() * 1000)}",
-        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "topic_arn": "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts",
+        "alert_id": simulated_receipt.get("alert_id", f"sns-{int(time.time() * 1000)}"),
+        "timestamp": simulated_receipt.get("timestamp", time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())),
+        "topic_arn": simulated_receipt.get("topic_arn", "arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts"),
         "patient_id": patient_id,
         "severity": conflict_warning.get("severity", "High"),
         "drugs": conflict_warning.get("drugs", []),
-        "subject": f"URGENT: Adverse Drug Conflict for {patient_id}",
-        "message": (
-            f"CareSync Safety Alert: High-risk drug interaction detected for {patient_id}. "
-            f"Warning: {conflict_warning.get('warning', '')}. Immediate clinical review advised."
-        )
+        "subject": simulated_receipt.get("subject", f"URGENT: Adverse Drug Conflict for {patient_id}"),
+        "message": simulated_receipt.get("message", f"CareSync Safety Alert: High-risk drug interaction detected for {patient_id}."),
+        "real_delivery": {
+            "ntfy": dispatch_result["receipts"].get("ntfy"),
+            "sms": dispatch_result["receipts"].get("sms")
+        }
     }
     ALERTS_LOG.append(alert_event)
-    logger.info(f"[SIMULATED SNS] Published alert to caresync-emergency-alerts: {alert_event['message']}")
+    logger.info(f"[EMERGENCY ALERT] Published to SNS & Real Phone: {alert_event['message']}")
     return alert_event
 
 
@@ -114,6 +131,39 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if "/alerts" in path:
         return _create_response(200, {"alerts": ALERTS_LOG[-20:]})
 
+    # Route: Real Phone Notification Endpoint
+    if "/notify" in path:
+        body = {}
+        if event.get("body"):
+            body = json.loads(event["body"]) if isinstance(event["body"], str) else event["body"]
+        
+        topic = body.get("topic", "caresync-eldercare-alerts")
+        title = body.get("title", "CareSync Test Notification")
+        message = body.get("message", "Test alert delivered to your phone from CareSync!")
+        priority = body.get("priority", "urgent")
+        phone_number = body.get("phone_number", "")
+
+        push_receipt = send_ntfy_push(
+            topic=topic,
+            title=title,
+            message=message,
+            priority=priority,
+            tags=["bell", "iphone", "robot"]
+        )
+
+        sms_receipt = None
+        if phone_number:
+            from app.notifier import send_aws_sns_sms
+            sms_receipt = send_aws_sns_sms(phone_number, f"{title}: {message}")
+
+        return _create_response(200, {
+            "status": "success",
+            "message": "Real phone alert dispatched",
+            "ntfy_receipt": push_receipt,
+            "sms_receipt": sms_receipt,
+            "how_to_receive": f"Open https://ntfy.sh/{topic} on your phone or install the free ntfy app."
+        })
+
     # Golden Path Route: POST /process-note
     try:
         raw_body = event.get("body", "{}")
@@ -123,6 +173,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         user_id = body_data.get("user_id", "User::Alice")
         patient_id = body_data.get("patient_id", "Grandma_Bob")
         doctors_note = body_data.get("doctors_note", "")
+        ntfy_topic = body_data.get("ntfy_topic") or body_data.get("topic")
+        phone_number = body_data.get("phone_number")
 
         if not doctors_note:
             return _create_response(400, {
@@ -162,12 +214,17 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Attach Cedar authorization metadata to output
         agent_result["authorization"] = auth_result
 
-        # Value-Add: Trigger simulated SNS alert if high-severity conflict found
+        # Value-Add: Trigger multi-channel alert (SNS + Real Phone Push) if high-severity conflict found
         dispatched_alerts = []
         if agent_result.get("conflict_found"):
             for warning in agent_result.get("interaction_warnings", []):
                 if warning.get("severity") in ["High", "Critical"]:
-                    sns_receipt = _dispatch_sns_emergency_alert(patient_id, warning)
+                    sns_receipt = _dispatch_sns_emergency_alert(
+                        patient_id=patient_id,
+                        conflict_warning=warning,
+                        ntfy_topic=ntfy_topic,
+                        phone_number=phone_number
+                    )
                     dispatched_alerts.append(sns_receipt)
 
         agent_result["dispatched_emergency_alerts"] = dispatched_alerts

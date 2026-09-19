@@ -1,7 +1,7 @@
 import React from 'react';
-import { ShieldCheck, Cloud, Cpu, Activity } from 'lucide-react';
+import { ShieldCheck, Cloud, Cpu, Activity, Smartphone } from 'lucide-react';
 
-export default function Header({ isLiveBackend }) {
+export default function Header({ isLiveBackend, onOpenPhoneAlerts }) {
   return (
     <header className="app-header">
       <div className="header-container">
@@ -35,6 +35,17 @@ export default function Header({ isLiveBackend }) {
 
         {/* Local Cloud Simulation Status Indicators */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div
+            className="badge badge-crimson glass-card-interactive"
+            onClick={onOpenPhoneAlerts}
+            style={{ cursor: 'pointer' }}
+            title="Configure Real Phone Push Notifications"
+          >
+            <Smartphone size={14} />
+            <span>Real Phone Alerts: Live 📲</span>
+            <span className="pulse-dot"></span>
+          </div>
+
           <div className="badge badge-emerald" title="AWS SAM Serverless Local API Gateway & Lambda">
             <Cloud size={14} />
             <span>SAM Local :3001</span>
