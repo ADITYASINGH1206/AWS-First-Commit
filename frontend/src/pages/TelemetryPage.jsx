@@ -51,7 +51,7 @@ export default function TelemetryPage() {
 
       {/* Cloud Service Architecture Pills */}
       <div
-        className="cs-card"
+        className="cs-card animate-stagger-1"
         style={{
           padding: '1.25rem 1.5rem',
           marginBottom: '1.5rem',
@@ -67,8 +67,8 @@ export default function TelemetryPage() {
             <Cloud size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>API Service</div>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>API Service</div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-pure)' }}>
               {isLiveBackend ? 'Live API Connected (:3001)' : 'Simulation Engine Active'}
             </div>
           </div>
@@ -79,8 +79,8 @@ export default function TelemetryPage() {
             <ShieldCheck size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Security Policy Engine</div>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-pure)' }}>Access Policy Evaluator</div>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Security Policy Engine</div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-pure)' }}>Access Policy Evaluator</div>
           </div>
         </div>
 
@@ -89,8 +89,8 @@ export default function TelemetryPage() {
             <Cpu size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Agent Orchestrator</div>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-pure)' }}>Autonomous Clinical Agent</div>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Agent Orchestrator</div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-pure)' }}>Autonomous Clinical Agent</div>
           </div>
         </div>
 
@@ -99,14 +99,14 @@ export default function TelemetryPage() {
             <Bell size={20} />
           </div>
           <div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 600 }}>Alert Engine</div>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--text-pure)' }}>Real-time Mobile Push & SMS</div>
+            <div style={{ fontSize: '0.74rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.04em' }}>Alert Engine</div>
+            <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-pure)' }}>Real-time Mobile Push & SMS</div>
           </div>
         </div>
       </div>
 
       {/* JSON Inspector with Navigation Tabs */}
-      <div className="cs-card" style={{ padding: '1.25rem', overflow: 'hidden', background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
+      <div className="cs-card animate-stagger-2" style={{ padding: '1.25rem', overflow: 'hidden', background: 'var(--surface-1)', border: '1px solid var(--border-default)' }}>
         <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid var(--border-default)', paddingBottom: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <button
             type="button"

@@ -155,22 +155,7 @@ export default function Header() {
                 key={item.id}
                 type="button"
                 onClick={() => navigateTo(item.id)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  padding: '0.75rem 1.15rem',
-                  background: isActive ? 'var(--surface-2)' : 'transparent',
-                  border: 'none',
-                  borderBottom: isActive ? '2px solid var(--primary)' : '2px solid transparent',
-                  color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-                  fontSize: '0.88rem',
-                  fontWeight: isActive ? 700 : 500,
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  whiteSpace: 'nowrap',
-                  borderRadius: '6px 6px 0 0',
-                }}
+                className={`cs-nav-tab ${isActive ? 'active' : ''}`}
               >
                 <Icon size={16} color={isActive ? 'var(--primary)' : 'currentColor'} />
                 <span>{item.label}</span>

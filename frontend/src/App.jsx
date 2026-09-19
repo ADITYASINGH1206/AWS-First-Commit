@@ -27,13 +27,15 @@ function AppContent() {
       <Header />
 
       <main style={{ maxWidth: '1440px', width: '100%', margin: '0 auto', padding: activeTab === 'home' ? '0' : '2rem 1.75rem', flex: 1 }}>
-        {/* Dynamic Page Views */}
-        {activeTab === 'home' && <HomePage />}
-        {activeTab === 'schedule' && <SchedulePage />}
-        {activeTab === 'intake' && <IntakePage />}
-        {activeTab === 'security' && <SecurityPage />}
-        {activeTab === 'alerts' && <AlertsPage />}
-        {activeTab === 'telemetry' && <TelemetryPage />}
+        {/* Dynamic Page Views with Smooth Keyed Transitions */}
+        <div key={activeTab} className="animate-fade-slide">
+          {activeTab === 'home' && <HomePage />}
+          {activeTab === 'schedule' && <SchedulePage />}
+          {activeTab === 'intake' && <IntakePage />}
+          {activeTab === 'security' && <SecurityPage />}
+          {activeTab === 'alerts' && <AlertsPage />}
+          {activeTab === 'telemetry' && <TelemetryPage />}
+        </div>
       </main>
 
       {/* Global Drawers & Modals */}

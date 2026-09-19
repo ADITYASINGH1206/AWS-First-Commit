@@ -197,7 +197,7 @@ export default function HomePage() {
 
       {/* Live System Metrics Bar */}
       <section
-        className="cs-card"
+        className="cs-card animate-stagger-1"
         style={{
           maxWidth: '1200px',
           margin: '0 auto 4.5rem',

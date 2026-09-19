@@ -37,7 +37,7 @@ export default function ExecutionTraceModal({ isOpen, onClose, traceData }) {
       aria-labelledby="trace-modal-title"
     >
       <div
-        className="cs-card"
+        className="cs-card animate-modal"
         style={{
           width: '100%',
           maxWidth: '900px',

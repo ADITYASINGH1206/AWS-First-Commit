@@ -66,7 +66,7 @@ export default function CaregiverSnsDrawer({
       onClick={onClose}
     >
       <aside
-        className="cs-card"
+        className="cs-card animate-drawer"
         style={{
           width: '100%',
           maxWidth: '520px',
