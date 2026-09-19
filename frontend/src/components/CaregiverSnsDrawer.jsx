@@ -18,9 +18,13 @@ export default function CaregiverSnsDrawer({
 
   if (!isOpen) return null;
 
+  const [copiedTopic, setCopiedTopic] = useState(false);
+  const [realSendStatus, setRealSendStatus] = useState(null); // 'sending' | 'sent' | 'error'
+  const topicChannel = `caresync-${(patientName || 'patient').toLowerCase().replace(/[^a-z0-9]/g, '')}-alerts`;
+
   const currentAlert = alerts && alerts.length > 0 ? alerts[0] : {
-    subject: `URGENT: Adverse Drug Conflict for Grandma_Bob`,
-    message: `CareSync Safety Alert: High-risk drug interaction detected for Grandma_Bob. Lisinopril 10mg + Ibuprofen 400mg may decrease kidney function and reduce BP control.`,
+    subject: `URGENT: Adverse Drug Conflict for ${patientName}`,
+    message: `CareSync Safety Alert: High-risk drug interaction detected for ${patientName}. Lisinopril 10mg + Ibuprofen 400mg may decrease kidney function and reduce BP control. Immediate clinical review advised.`,
     timestamp: new Date().toISOString(),
     topic_arn: 'arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts',
   };
@@ -57,15 +61,16 @@ export default function CaregiverSnsDrawer({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(3, 7, 18, 0.85)',
+        backdropFilter: 'blur(12px)',
         zIndex: 100,
         display: 'flex',
         justifyContent: 'flex-end',
       }}
       onClick={onClose}
     >
-      <div
+      <aside
+        className="cs-card"
         style={{
           width: '100%',
           maxWidth: '520px',
@@ -93,6 +98,7 @@ export default function CaregiverSnsDrawer({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                color: '#f87171',
               }}
             >
               <Bell size={20} color="#ef4444" />
@@ -110,8 +116,9 @@ export default function CaregiverSnsDrawer({
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary"
-            style={{ padding: '0.4rem', borderRadius: '50%' }}
+            className="cs-btn cs-btn-secondary"
+            style={{ padding: '0.5rem', borderRadius: '50%', minWidth: 'auto', height: 'auto' }}
+            aria-label="Close Drawer"
           >
             <X size={18} />
           </button>
@@ -119,6 +126,7 @@ export default function CaregiverSnsDrawer({
 
         {/* Tab Switcher */}
         <div
+          className="cs-card"
           style={{
             display: 'flex',
             gap: '0.5rem',
@@ -402,7 +410,8 @@ export default function CaregiverSnsDrawer({
         >
           Close Drawer
         </button>
-      </div>
+      </aside>
     </div>
   );
 }
+

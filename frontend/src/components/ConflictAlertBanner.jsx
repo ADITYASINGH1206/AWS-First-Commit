@@ -1,75 +1,82 @@
 import React from 'react';
-import { AlertTriangle, BellRing, ShieldAlert, HeartPulse, Info } from 'lucide-react';
+import { AlertOctagon, BellRing, Info, ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
   if (!warnings || warnings.length === 0) return null;
 
   return (
     <div
-      className="glass-panel animate-fade-in"
+      className="cs-card animate-fade-slide"
       style={{
-        border: '1.5px solid var(--border-danger)',
-        background: 'rgba(239, 68, 68, 0.08)',
-        boxShadow: 'var(--shadow-danger)',
-        padding: '1.25rem 1.5rem',
+        border: '1.5px solid var(--danger-border)',
+        background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%)',
+        boxShadow: 'var(--shadow-glow-danger)',
+        padding: '1.35rem 1.6rem',
         marginTop: '1.25rem',
         borderRadius: 'var(--radius-md)',
       }}
+      role="alert"
+      aria-live="assertive"
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flex: 1 }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', flex: 1, minWidth: '280px' }}>
           <div
             style={{
-              padding: '0.65rem',
-              borderRadius: '12px',
-              background: 'rgba(239, 68, 68, 0.2)',
+              padding: '0.7rem',
+              borderRadius: '11px',
+              background: 'rgba(220, 38, 38, 0.22)',
+              border: '1px solid rgba(220, 38, 38, 0.4)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <AlertTriangle size={26} color="#ef4444" />
+            <AlertOctagon size={28} color="#ef4444" />
           </div>
 
           <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#fca5a5' }}>
-                CRITICAL DRUG INTERACTION DETECTED
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
+              <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#fca5a5', letterSpacing: '-0.02em' }}>
+                CRITICAL DRUG INTERACTION INTERCEPTED
               </h3>
-              <span className="badge badge-crimson" style={{ fontSize: '0.7rem' }}>
+              <span className="cs-badge cs-badge-crimson" style={{ fontSize: '0.72rem' }}>
                 Severity: {warnings[0]?.severity || 'High'}
               </span>
             </div>
 
             {warnings.map((w, idx) => (
-              <div key={idx} style={{ marginTop: '0.5rem' }}>
-                <p style={{ fontSize: '0.92rem', fontWeight: 600, color: '#fef2f2' }}>
+              <div key={idx} style={{ marginTop: '0.45rem' }}>
+                <p style={{ fontSize: '0.94rem', fontWeight: 600, color: '#ffffff', lineHeight: 1.45 }}>
                   {w.warning}
                 </p>
 
                 {w.clinical_guidance && (
-                  <p style={{ fontSize: '0.82rem', color: '#fecaca', marginTop: '0.35rem', lineHeight: 1.5 }}>
-                    <Info size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: '-2px' }} />
+                  <p style={{ fontSize: '0.84rem', color: '#fecaca', marginTop: '0.4rem', lineHeight: 1.5 }}>
+                    <Info size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
                     <strong>Clinical Guidance:</strong> {w.clinical_guidance}
                   </p>
                 )}
 
                 {w.drugs && (
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.7rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                      Clashing Regimen:
+                    </span>
                     {w.drugs.map((d, dIdx) => (
                       <span
                         key={dIdx}
                         style={{
-                          fontSize: '0.75rem',
+                          fontSize: '0.78rem',
                           fontFamily: 'var(--font-mono)',
-                          padding: '0.2rem 0.5rem',
+                          fontWeight: 600,
+                          padding: '0.25rem 0.6rem',
                           borderRadius: '6px',
-                          background: 'rgba(239, 68, 68, 0.25)',
+                          background: 'rgba(220, 38, 38, 0.28)',
                           color: '#ffffff',
-                          border: '1px solid rgba(239, 68, 68, 0.4)',
+                          border: '1px solid rgba(220, 38, 38, 0.45)',
                         }}
                       >
-                        💊 {d}
+                        {d}
                       </span>
                     ))}
                   </div>
@@ -79,20 +86,22 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
           </div>
         </div>
 
-        {/* SNS Emergency Dispatch Button */}
+        {/* Action Button to Open Real Alert Dispatcher */}
         <button
           type="button"
           onClick={onOpenSnsDrawer}
           className="btn-secondary"
           style={{
-            borderColor: 'rgba(239, 68, 68, 0.4)',
-            background: 'rgba(239, 68, 68, 0.15)',
-            color: '#fca5a5',
-            fontSize: '0.82rem',
+            borderColor: 'rgba(220, 38, 38, 0.45)',
+            background: 'rgba(220, 38, 38, 0.16)',
+            color: '#fecaca',
+            fontSize: '0.84rem',
+            alignSelf: 'center',
           }}
         >
           <BellRing size={16} color="#ef4444" />
-          <span>View Dispatched SNS Alert</span>
+          <span>View Real Phone Alert Dispatch</span>
+          <ArrowRight size={14} />
         </button>
       </div>
     </div>
