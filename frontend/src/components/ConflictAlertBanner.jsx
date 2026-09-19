@@ -8,9 +8,9 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
     <div
       className="cs-card animate-fade-slide"
       style={{
-        border: '1.5px solid var(--danger-border)',
-        background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%)',
-        boxShadow: 'var(--shadow-glow-danger)',
+        border: '1.5px solid #fca5a5',
+        background: '#fff1f2',
+        boxShadow: '0 4px 14px rgba(220, 38, 38, 0.08)',
         padding: '1.35rem 1.6rem',
         marginTop: '1.25rem',
         borderRadius: 'var(--radius-md)',
@@ -24,20 +24,20 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
             style={{
               padding: '0.7rem',
               borderRadius: '11px',
-              background: 'rgba(220, 38, 38, 0.22)',
-              border: '1px solid rgba(220, 38, 38, 0.4)',
+              background: '#fee2e2',
+              border: '1px solid #fca5a5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <AlertOctagon size={28} color="#ef4444" />
+            <AlertOctagon size={28} color="#dc2626" />
           </div>
 
           <div style={{ flex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem', flexWrap: 'wrap' }}>
-              <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#fca5a5', letterSpacing: '-0.02em' }}>
-                CRITICAL DRUG INTERACTION INTERCEPTED
+              <h3 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#991b1b', letterSpacing: '-0.02em' }}>
+                CRITICAL DRUG INTERACTION DETECTED
               </h3>
               <span className="cs-badge cs-badge-crimson" style={{ fontSize: '0.72rem' }}>
                 Severity: {warnings[0]?.severity || 'High'}
@@ -46,12 +46,12 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
 
             {warnings.map((w, idx) => (
               <div key={idx} style={{ marginTop: '0.45rem' }}>
-                <p style={{ fontSize: '0.94rem', fontWeight: 600, color: '#ffffff', lineHeight: 1.45 }}>
+                <p style={{ fontSize: '0.94rem', fontWeight: 600, color: '#1e293b', lineHeight: 1.45 }}>
                   {w.warning}
                 </p>
 
                 {w.clinical_guidance && (
-                  <p style={{ fontSize: '0.84rem', color: '#fecaca', marginTop: '0.4rem', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '0.84rem', color: '#7f1d1d', marginTop: '0.4rem', lineHeight: 1.5 }}>
                     <Info size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: '-2px' }} />
                     <strong>Clinical Guidance:</strong> {w.clinical_guidance}
                   </p>
@@ -60,7 +60,7 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
                 {w.drugs && (
                   <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.7rem', flexWrap: 'wrap', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                      Clashing Regimen:
+                      Interacting Medications:
                     </span>
                     {w.drugs.map((d, dIdx) => (
                       <span
@@ -68,12 +68,12 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
                         style={{
                           fontSize: '0.78rem',
                           fontFamily: 'var(--font-mono)',
-                          fontWeight: 600,
+                          fontWeight: 700,
                           padding: '0.25rem 0.6rem',
                           borderRadius: '6px',
-                          background: 'rgba(220, 38, 38, 0.28)',
-                          color: '#ffffff',
-                          border: '1px solid rgba(220, 38, 38, 0.45)',
+                          background: '#fee2e2',
+                          color: '#991b1b',
+                          border: '1px solid #fca5a5',
                         }}
                       >
                         {d}
@@ -90,20 +90,23 @@ export default function ConflictAlertBanner({ warnings, onOpenSnsDrawer }) {
         <button
           type="button"
           onClick={onOpenSnsDrawer}
-          className="btn-secondary"
+          className="cs-btn"
           style={{
-            borderColor: 'rgba(220, 38, 38, 0.45)',
-            background: 'rgba(220, 38, 38, 0.16)',
-            color: '#fecaca',
+            borderColor: '#fca5a5',
+            background: '#ffffff',
+            color: '#b91c1c',
+            border: '1.5px solid #fca5a5',
             fontSize: '0.84rem',
             alignSelf: 'center',
+            boxShadow: 'var(--shadow-sm)',
           }}
         >
-          <BellRing size={16} color="#ef4444" />
-          <span>View Real Phone Alert Dispatch</span>
+          <BellRing size={16} color="#dc2626" />
+          <span>Dispatch Phone Alert</span>
           <ArrowRight size={14} />
         </button>
       </div>
     </div>
   );
 }
+

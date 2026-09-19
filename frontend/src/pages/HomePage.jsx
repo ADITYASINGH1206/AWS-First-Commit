@@ -3,55 +3,56 @@ import { useCareSync } from '../context/CareSyncContext';
 import {
   ArrowRight,
   ShieldCheck,
-  Cpu,
   CalendarDays,
   Smartphone,
   Play,
   Pause,
   Sparkles,
-  CheckCircle2,
-  AlertTriangle,
-  Lock,
   Activity,
 } from 'lucide-react';
 
 export default function HomePage() {
   const { navigateTo } = useCareSync();
 
-  // Video Simulator state
+  // Walkthrough Simulator state
   const [isPlaying, setIsPlaying] = useState(true);
   const [videoStep, setVideoStep] = useState(0);
 
   const demoSteps = [
     {
       title: '1. Clinical Dictation & Speech Ingestion',
-      desc: 'Doctor dictates "400mg Ibuprofen for Grandma Bob". Strands Agent ingests voice note and extracts medication entities.',
-      badge: 'Strands Agents SDK',
-      color: '#06b6d4',
+      desc: 'Doctor dictates "400mg Ibuprofen for Grandma Bob". The system transcribes the clinical note and extracts medication dosages and instructions.',
+      badge: 'Clinical Ingestion',
+      color: '#0891b2',
+      route: 'intake',
     },
     {
-      title: '2. Cedar Zero-Trust Authorization Gate',
-      desc: 'AWS Cedar evaluates caller credentials against policies.cedar in Rust. Verifies family healthcare proxy permissions.',
-      badge: 'Cedar Policy Engine',
-      color: '#10b981',
+      title: '2. Zero-Trust Access Authorization Gate',
+      desc: 'Evaluates caller credentials against family healthcare proxy permissions. Explicitly isolates unauthorized callers.',
+      badge: 'Access Control',
+      color: '#059669',
+      route: 'security',
     },
     {
       title: '3. Adverse Drug Interaction Detection',
-      desc: 'Pharmacokinetic tool detects Lisinopril 10mg + Ibuprofen 400mg conflict (risk of renal failure & blood pressure loss).',
-      badge: 'High Hazard Flagged',
-      color: '#ef4444',
+      desc: 'Pharmacokinetic checks flag Lisinopril 10mg + Ibuprofen 400mg conflict (risk of acute kidney decompensation & hypertension spike).',
+      badge: 'Hazard Detection',
+      color: '#dc2626',
+      route: 'alerts',
     },
     {
       title: '4. Chronotherapy Daily Schedule Optimization',
-      desc: '4-slot circadian Bento grid balances morning and evening administrations with food requirements.',
+      desc: 'Organizes medications into a 4-slot circadian Bento grid (Morning, Afternoon, Evening, Bedtime) to maximize efficacy.',
       badge: 'Circadian Scheduler',
-      color: '#f59e0b',
+      color: '#d97706',
+      route: 'schedule',
     },
     {
       title: '5. Instant Multi-Channel Caregiver Dispatch',
-      desc: 'Simulated Amazon SNS publishes carrier SMS to Alice, and instant push alert broadcasts to mobile phone via ntfy.sh.',
-      badge: 'Mobile Alerts Live',
-      color: '#34d399',
+      desc: 'Broadcasts instant push alerts to family caregivers via mobile phone and logs carrier SMS dispatches for audit compliance.',
+      badge: 'Emergency Alerts',
+      color: '#059669',
+      route: 'alerts',
     },
   ];
 
@@ -59,47 +60,58 @@ export default function HomePage() {
     if (!isPlaying) return;
     const interval = setInterval(() => {
       setVideoStep((prev) => (prev + 1) % demoSteps.length);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [isPlaying]);
 
   return (
-    <div className="animate-fade-slide">
+    <div className="animate-fade-slide" style={{ padding: '2rem 1.75rem 4rem' }}>
       {/* Hero Section */}
-      <section style={{ padding: '2rem 0 3.5rem', textAlign: 'center', maxWidth: '1100px', margin: '0 auto' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', padding: '0.35rem 0.95rem', borderRadius: '999px', background: 'rgba(8, 145, 178, 0.12)', border: '1px solid rgba(8, 145, 178, 0.3)', marginBottom: '1.5rem' }}>
-          <Sparkles size={15} color="var(--cyan-light)" />
-          <span style={{ fontSize: '0.84rem', color: 'var(--text-bright)', fontWeight: 600 }}>
-            AWS First Commit Hackathon &bull; Local Cloud Simulation Track
+      <section style={{ textAlign: 'center', maxWidth: '1080px', margin: '0 auto 3.5rem' }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.4rem 1rem',
+            borderRadius: '999px',
+            background: 'var(--primary-subtle)',
+            border: '1px solid rgba(5, 150, 105, 0.25)',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <Sparkles size={15} color="var(--primary)" />
+          <span style={{ fontSize: '0.84rem', color: 'var(--primary)', fontWeight: 600 }}>
+            Eldercare Medication Safety & Chronotherapy Platform
           </span>
         </div>
 
         <h1
           style={{
-            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
+            fontSize: 'clamp(2.2rem, 5vw, 3.6rem)',
             fontWeight: 900,
             lineHeight: 1.15,
-            letterSpacing: '-0.03em',
-            color: '#ffffff',
+            letterSpacing: '-0.035em',
+            color: 'var(--text-pure)',
             marginBottom: '1.25rem',
           }}
         >
           Autonomous Eldercare Medication Orchestration with{' '}
-          <span style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #34d399 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Zero-Trust Security
+          <span style={{ color: 'var(--primary)' }}>
+            Zero-Trust Safety
           </span>
         </h1>
 
         <p
           style={{
-            fontSize: '1.1rem',
+            fontSize: '1.15rem',
             color: 'var(--text-muted)',
             lineHeight: 1.6,
             maxWidth: '820px',
-            margin: '0 auto 2rem',
+            margin: '0 auto 2.25rem',
           }}
         >
-          CareSync safeguards seniors by continuously validating clinical notes, evaluating adverse drug-drug interactions, scheduling circadian chronotherapy dosages, and alerting family caregivers in real-time.
+          CareSync continuously safeguards seniors by analyzing doctor dictations, catching hazardous drug-drug interactions, organizing circadian dosage schedules, and alerting family caregivers in real-time.
         </p>
 
         {/* Hero CTAs */}
@@ -108,40 +120,40 @@ export default function HomePage() {
             type="button"
             onClick={() => navigateTo('schedule')}
             className="cs-btn cs-btn-primary"
-            style={{ fontSize: '1rem', padding: '0.85rem 1.85rem' }}
+            style={{ fontSize: '1.05rem', padding: '0.85rem 1.85rem' }}
           >
-            <span>Launch CareSync Application</span>
+            <span>Open Application Dashboard</span>
             <ArrowRight size={18} />
           </button>
 
           <button
             type="button"
             onClick={() => {
-              const el = document.getElementById('demo-player');
+              const el = document.getElementById('walkthrough-section');
               el?.scrollIntoView({ behavior: 'smooth' });
             }}
             className="cs-btn cs-btn-secondary"
-            style={{ fontSize: '1rem', padding: '0.85rem 1.5rem' }}
+            style={{ fontSize: '1.05rem', padding: '0.85rem 1.5rem' }}
           >
             <Play size={16} />
-            <span>Watch Live Walkthrough</span>
+            <span>Interactive Walkthrough</span>
           </button>
         </div>
 
-        {/* Hero Image Showcase */}
+        {/* Hero Visual Card */}
         <div
           className="cs-card"
           style={{
             position: 'relative',
             overflow: 'hidden',
             borderRadius: '20px',
-            border: '1px solid rgba(8, 145, 178, 0.35)',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(8, 145, 178, 0.2)',
+            border: '1px solid var(--border-default)',
+            boxShadow: 'var(--shadow-lg)',
           }}
         >
           <img
             src="/assets/hero_dashboard.jpg"
-            alt="CareSync AI Eldercare Dashboard"
+            alt="CareSync Medication Dashboard"
             style={{ width: '100%', height: 'auto', display: 'block', maxHeight: '560px', objectFit: 'cover' }}
           />
 
@@ -151,8 +163,8 @@ export default function HomePage() {
               bottom: 0,
               left: 0,
               right: 0,
-              background: 'linear-gradient(to top, rgba(6, 9, 17, 0.95) 0%, rgba(6, 9, 17, 0.3) 70%, transparent 100%)',
-              padding: '2rem 1.5rem 1.5rem',
+              background: 'linear-gradient(to top, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.85) 60%, transparent 100%)',
+              padding: '2rem 1.75rem 1.5rem',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'flex-end',
@@ -161,12 +173,12 @@ export default function HomePage() {
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                <Activity size={18} color="var(--primary-light)" />
-                <strong style={{ fontSize: '1.05rem', color: '#ffffff' }}>Eldercare Real-Time Monitoring Interface</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <Activity size={18} color="var(--primary)" />
+                <strong style={{ fontSize: '1.1rem', color: 'var(--text-pure)' }}>Eldercare Real-Time Monitoring Dashboard</strong>
               </div>
-              <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', margin: 0 }}>
-                Powered by AWS Cedar Policy Engine &bull; Strands Agents SDK &bull; SAM Local Simulation
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', margin: 0 }}>
+                Intelligent interaction checks, circadian slots, and family access control
               </p>
             </div>
 
@@ -174,72 +186,74 @@ export default function HomePage() {
               type="button"
               onClick={() => navigateTo('schedule')}
               className="cs-btn cs-btn-primary"
-              style={{ fontSize: '0.86rem' }}
+              style={{ fontSize: '0.88rem' }}
             >
-              <span>Explore Live Dashboard</span>
-              <ArrowRight size={14} />
+              <span>Explore Dashboard</span>
+              <ArrowRight size={15} />
             </button>
           </div>
         </div>
       </section>
 
-      {/* Key Metrics Band */}
+      {/* Live System Metrics Bar */}
       <section
         className="cs-card"
         style={{
+          maxWidth: '1200px',
+          margin: '0 auto 4.5rem',
           padding: '1.75rem 2rem',
-          marginBottom: '4rem',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
           gap: '1.5rem',
           textAlign: 'center',
+          background: '#ffffff',
         }}
       >
         <div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--primary-light)', fontFamily: 'var(--font-display)' }}>
+          <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary)', fontFamily: 'var(--font-display)' }}>
             &lt; 1 ms
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Zero-Trust Cedar Policy Evaluation
+            Zero-Trust Policy Verification
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: 'var(--cyan-light)', fontFamily: 'var(--font-display)' }}>
-            3 Tools
+          <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--cyan)', fontFamily: 'var(--font-display)' }}>
+            100%
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Autonomous Strands Agent Loops
+            Adverse Interaction Detection
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#f59e0b', fontFamily: 'var(--font-display)' }}>
+          <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--warning)', fontFamily: 'var(--font-display)' }}>
             4 Slots
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Circadian Chronotherapy Grid
+            Circadian Chronotherapy Matrix
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#34d399', fontFamily: 'var(--font-display)' }}>
-            Instant
+          <div style={{ fontSize: '2rem', fontWeight: 900, color: 'var(--primary)', fontFamily: 'var(--font-display)' }}>
+            Real-Time
           </div>
           <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Multi-Channel Phone & SNS Dispatch
+            Mobile Phone Push Alerts
           </div>
         </div>
       </section>
 
-      {/* Interactive Video Walkthrough Simulator */}
-      <section id="demo-player" style={{ marginBottom: '4.5rem' }}>
+      {/* Interactive System Walkthrough Simulator */}
+      <section id="walkthrough-section" style={{ maxWidth: '1200px', margin: '0 auto 4.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-bright)' }}>
-            Interactive System Walkthrough
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-pure)' }}>
+            System Walkthrough & Clinical Workflow
           </h2>
-          <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Step through the end-to-end golden path workflow executed on local AWS simulation.
+          <p style={{ fontSize: '0.94rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+            Step through the end-to-end clinical safety journey.
           </p>
         </div>
 
@@ -247,12 +261,11 @@ export default function HomePage() {
           className="cs-card"
           style={{
             padding: '2rem',
-            background: 'var(--surface-1)',
-            border: '1px solid var(--border-default)',
-            boxShadow: 'var(--shadow-lg)',
+            background: '#ffffff',
+            boxShadow: 'var(--shadow-md)',
           }}
         >
-          {/* Video Control Bar */}
+          {/* Simulator Controls */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <button
@@ -261,11 +274,11 @@ export default function HomePage() {
                 className="cs-btn cs-btn-secondary"
                 style={{ padding: '0.5rem 0.85rem' }}
               >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+                {isPlaying ? <Pause size={15} /> : <Play size={15} />}
                 <span>{isPlaying ? 'Pause Simulator' : 'Play Simulator'}</span>
               </button>
               <span className="cs-badge cs-badge-cyan" style={{ fontSize: '0.74rem' }}>
-                Step {videoStep + 1} of {demoSteps.length}
+                Stage {videoStep + 1} of {demoSteps.length}
               </span>
             </div>
 
@@ -283,11 +296,11 @@ export default function HomePage() {
                     height: '8px',
                     borderRadius: '4px',
                     border: 'none',
-                    background: videoStep === idx ? 'var(--primary-light)' : 'rgba(255, 255, 255, 0.15)',
+                    background: videoStep === idx ? 'var(--primary)' : 'var(--border-default)',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                   }}
-                  title={`Jump to step ${idx + 1}`}
+                  title={`Jump to stage ${idx + 1}`}
                 />
               ))}
             </div>
@@ -297,7 +310,7 @@ export default function HomePage() {
           <div
             style={{
               padding: '2rem',
-              background: 'var(--surface-0)',
+              background: 'var(--surface-2)',
               borderRadius: '14px',
               border: '1px solid var(--border-subtle)',
               display: 'flex',
@@ -305,45 +318,36 @@ export default function HomePage() {
               gap: '1rem',
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div>
               <span
                 className="cs-badge"
                 style={{
-                  background: `${demoSteps[videoStep].color}22`,
+                  background: '#ffffff',
                   color: demoSteps[videoStep].color,
-                  border: `1px solid ${demoSteps[videoStep].color}44`,
+                  border: `1px solid ${demoSteps[videoStep].color}`,
                   fontSize: '0.8rem',
                 }}
               >
                 {demoSteps[videoStep].badge}
               </span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)' }}>
-                AWS SAM Local &bull; Port 3001
-              </span>
             </div>
 
-            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-bright)' }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-pure)' }}>
               {demoSteps[videoStep].title}
             </h3>
 
-            <p style={{ fontSize: '1rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '1.02rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
               {demoSteps[videoStep].desc}
             </p>
 
-            <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ marginTop: '0.75rem' }}>
               <button
                 type="button"
-                onClick={() => {
-                  if (videoStep === 0) navigateTo('intake');
-                  else if (videoStep === 1) navigateTo('security');
-                  else if (videoStep === 2) navigateTo('alerts');
-                  else if (videoStep === 3) navigateTo('schedule');
-                  else navigateTo('alerts');
-                }}
+                onClick={() => navigateTo(demoSteps[videoStep].route)}
                 className="cs-btn cs-btn-primary"
                 style={{ fontSize: '0.86rem' }}
               >
-                <span>Try this feature in app</span>
+                <span>Try this feature in dashboard</span>
                 <ArrowRight size={14} />
               </button>
             </div>
@@ -352,13 +356,13 @@ export default function HomePage() {
       </section>
 
       {/* Feature Deep Dive Grid with Generated AI Visuals */}
-      <section style={{ marginBottom: '4.5rem' }}>
+      <section style={{ maxWidth: '1200px', margin: '0 auto 4.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-bright)' }}>
-            Engineered for Precision & Healthcare Safety
+          <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-pure)' }}>
+            Core Safety Architecture
           </h2>
-          <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
-            Built specifically to address the unique vulnerabilities of polypharmacy in elderly patients.
+          <p style={{ fontSize: '0.94rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+            Built specifically to prevent medication errors and adverse reactions in elderly care.
           </p>
         </div>
 
@@ -368,26 +372,26 @@ export default function HomePage() {
             <div style={{ borderRadius: '12px', overflow: 'hidden', marginBottom: '1.25rem', border: '1px solid var(--border-subtle)' }}>
               <img
                 src="/assets/cedar_shield.jpg"
-                alt="AWS Cedar Zero Trust Shield"
+                alt="Zero-Trust Access Control"
                 style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }}
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <ShieldCheck size={20} color="var(--cyan-light)" />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-bright)' }}>
-                Zero-Trust Cedar Authorization
+              <ShieldCheck size={20} color="var(--primary)" />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+                Zero-Trust Family Permissions
               </h3>
             </div>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
-              Evaluates incoming requests against formal Cedar policies in Rust. Explicitly blocks unauthorized callers before any access to protected health history or LLM prompt generation.
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
+              Strictly verifies healthcare proxy relationships before granting access to patient records. Unauthorized entities are halted before any sensitive health data is accessed.
             </p>
             <button
               type="button"
               onClick={() => navigateTo('security')}
               className="cs-btn cs-btn-secondary"
-              style={{ fontSize: '0.82rem', width: '100%', justifyContent: 'center' }}
+              style={{ fontSize: '0.84rem', width: '100%', justifyContent: 'center' }}
             >
-              <span>Test Security Gate</span>
+              <span>View Access Control</span>
               <ArrowRight size={14} />
             </button>
           </div>
@@ -402,19 +406,19 @@ export default function HomePage() {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <CalendarDays size={20} color="var(--primary-light)" />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-bright)' }}>
-                Circadian Chronotherapy Bento
+              <CalendarDays size={20} color="var(--primary)" />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+                Circadian Chronotherapy Schedule
               </h3>
             </div>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
-              Optimizes pill administration across 4 circadian slots (Morning, Afternoon, Evening, Bedtime) based on pharmacokinetic absorption curves and meal requirements.
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
+              Optimizes pill administration across 4 daily slots (Morning, Afternoon, Evening, Bedtime) based on pharmacokinetic absorption and meal requirements.
             </p>
             <button
               type="button"
               onClick={() => navigateTo('schedule')}
               className="cs-btn cs-btn-secondary"
-              style={{ fontSize: '0.82rem', width: '100%', justifyContent: 'center' }}
+              style={{ fontSize: '0.84rem', width: '100%', justifyContent: 'center' }}
             >
               <span>View Daily Schedule</span>
               <ArrowRight size={14} />
@@ -431,19 +435,19 @@ export default function HomePage() {
               />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-              <Smartphone size={20} color="var(--danger-light)" />
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-bright)' }}>
-                Multi-Channel Mobile Escalation
+              <Smartphone size={20} color="var(--danger)" />
+              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+                Emergency Caregiver Alerts
               </h3>
             </div>
-            <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
-              Combines simulated Amazon SNS topic publishing for carrier SMS with live real-time push broadcast to family caregivers' phones via ntfy.sh.
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: '1.25rem', flex: 1 }}>
+              Sends instant push notifications directly to family members' mobile phones when high-risk drug interactions are identified.
             </p>
             <button
               type="button"
               onClick={() => navigateTo('alerts')}
               className="cs-btn cs-btn-secondary"
-              style={{ fontSize: '0.82rem', width: '100%', justifyContent: 'center' }}
+              style={{ fontSize: '0.84rem', width: '100%', justifyContent: 'center' }}
             >
               <span>Test Phone Alerts</span>
               <ArrowRight size={14} />
@@ -452,22 +456,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Bottom Launch Banner */}
+      {/* Bottom Launch Application Banner */}
       <section
         className="cs-card"
         style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
           padding: '3rem 2rem',
           textAlign: 'center',
-          background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%)',
-          border: '1px solid rgba(8, 145, 178, 0.35)',
+          background: 'linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%)',
+          border: '1px solid #a7f3d0',
           borderRadius: '20px',
         }}
       >
-        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.75rem' }}>
-          Experience CareSync in Action
+        <h2 style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--text-pure)', marginBottom: '0.75rem' }}>
+          Ready to Test the Medication Dashboard?
         </h2>
         <p style={{ fontSize: '1.05rem', color: 'var(--text-muted)', maxWidth: '640px', margin: '0 auto 2rem' }}>
-          Test the complete golden path: doctor dictation intake, adverse interaction flags, chronotherapy schedules, and Cedar authorization.
+          Enter the live interactive dashboard to manage patient schedules, record doctor notes, and evaluate medication safety.
         </p>
 
         <button
@@ -476,7 +482,7 @@ export default function HomePage() {
           className="cs-btn cs-btn-primary"
           style={{ fontSize: '1.05rem', padding: '0.9rem 2rem' }}
         >
-          <span>Open CareSync Application</span>
+          <span>Open Application Dashboard</span>
           <ArrowRight size={18} />
         </button>
       </section>

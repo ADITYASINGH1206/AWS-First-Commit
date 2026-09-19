@@ -23,11 +23,11 @@ export default function AlertsPage() {
   ];
 
   const currentAlert = resultData?.dispatched_emergency_alerts?.[0] || {
-    alert_id: 'sns-simulated-001',
+    alert_id: 'alert-001',
     subject: `URGENT: Adverse Drug Conflict for ${patientName}`,
     message: `CareSync Safety Alert: High-risk drug interaction detected for ${patientName}. Lisinopril 10mg + Ibuprofen 400mg may decrease kidney function and reduce BP control. Immediate clinical review advised.`,
     timestamp: new Date().toISOString(),
-    topic_arn: 'arn:aws:sns:us-east-1:000000000000:caresync-emergency-alerts',
+    topic_arn: 'caresync-emergency-alerts',
   };
 
   const copyChannelUrl = () => {
@@ -60,34 +60,34 @@ export default function AlertsPage() {
   return (
     <div className="animate-fade-slide">
       {/* Page Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.75rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Bell size={24} color="var(--danger-light)" />
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-bright)' }}>
-              Caregiver Emergency Alerts & Multi-Channel Dispatch
+            <Bell size={24} color="var(--danger)" />
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-pure)' }}>
+              Caregiver Emergency Alerts & Notifications
             </h1>
           </div>
-          <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            Instant escalation when adverse drug-drug interactions or missed high-risk dosages are flagged. Supports simulated Amazon SNS and real-time mobile push notifications.
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+            Emergency escalation when adverse drug interactions are flagged. Supports instant mobile push notifications and carrier SMS alerts.
           </p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
           <span className="cs-badge cs-badge-crimson">
             <Radio size={12} />
-            <span>Active Alerts: {warnings.length}</span>
+            <span>Active Conflicts: {warnings.length}</span>
           </span>
         </div>
       </div>
 
       {/* Main Grid: Hazard Warning & Mobile Channels */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.5rem', marginBottom: '1.5rem' }}>
-        {/* Left Column: Adverse Interaction Clinical Breakdown */}
-        <div className="cs-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-            <AlertOctagon size={20} color="var(--danger-light)" />
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-bright)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '1.75rem', marginBottom: '1.75rem' }}>
+        {/* Left Column: Drug Conflict Evaluation */}
+        <div className="cs-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
+            <AlertOctagon size={20} color="var(--danger)" />
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-pure)' }}>
               Clinical Drug Conflict Evaluation
             </h2>
           </div>
@@ -98,7 +98,7 @@ export default function AlertsPage() {
               style={{
                 padding: '1.25rem',
                 borderRadius: '10px',
-                background: 'rgba(220, 38, 38, 0.08)',
+                background: 'var(--danger-subtle)',
                 border: '1px solid var(--danger-border)',
                 marginBottom: '1rem',
               }}
@@ -109,70 +109,70 @@ export default function AlertsPage() {
                     <span
                       key={dIdx}
                       className="cs-badge"
-                      style={{ background: 'rgba(0,0,0,0.5)', color: '#fca5a5', border: '1px solid var(--danger-border)', fontSize: '0.74rem' }}
+                      style={{ background: '#ffffff', color: 'var(--danger)', border: '1px solid var(--danger-border)', fontSize: '0.76rem' }}
                     >
                       {drug}
                     </span>
                   ))}
                 </div>
-                <span className="cs-badge cs-badge-crimson" style={{ fontSize: '0.72rem' }}>
-                  {w.severity || 'High'} Hazard
+                <span className="cs-badge cs-badge-crimson" style={{ fontSize: '0.74rem' }}>
+                  {w.severity || 'High'} Severity
                 </span>
               </div>
 
-              <h3 style={{ fontSize: '0.96rem', fontWeight: 700, color: '#fca5a5', marginBottom: '0.45rem' }}>
+              <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--danger)', marginBottom: '0.45rem' }}>
                 {w.warning}
               </h3>
-              <p style={{ fontSize: '0.82rem', color: '#fee2e2', lineHeight: 1.5 }}>
+              <p style={{ fontSize: '0.84rem', color: '#7f1d1d', lineHeight: 1.5 }}>
                 {w.clinical_guidance || 'NSAIDs attenuate hypotensive effect and increase risk of acute renal decompensation.'}
               </p>
             </div>
           ))}
 
-          {/* Caregiver Escalation Roster */}
-          <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.6rem', color: 'var(--text-dim)', fontSize: '0.76rem', textTransform: 'uppercase', fontWeight: 600 }}>
+          {/* Caregiver Contacts */}
+          <div style={{ marginTop: 'auto', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem', color: 'var(--text-dim)', fontSize: '0.78rem', textTransform: 'uppercase', fontWeight: 600 }}>
               <Users size={14} />
-              <span>Registered Emergency Caregivers</span>
+              <span>Designated Emergency Family Contacts</span>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--text-main)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Alice (Primary Daughter &bull; Healthcare Proxy)</span>
-                <strong style={{ color: 'var(--text-bright)' }}>+1 (555) 019-2834</strong>
+                <span>Alice (Daughter &bull; Primary Healthcare Proxy)</span>
+                <strong>+1 (555) 019-2834</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Charlie (Secondary Son)</span>
-                <strong style={{ color: 'var(--text-bright)' }}>+1 (555) 019-9941</strong>
+                <span>Charlie (Son &bull; Secondary Contact)</span>
+                <strong>+1 (555) 019-9941</strong>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column: Multi-Channel Real Phone & Simulated SMS Dispatch */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* Right Column: Mobile Notification Hub */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {/* Live Mobile Push Channel */}
           <div
             className="cs-card"
             style={{
               padding: '1.5rem',
-              background: 'var(--surface-2)',
-              border: '1px solid rgba(8, 145, 178, 0.3)',
+              background: '#ffffff',
+              border: '1px solid #a5f3fc',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
-                <Radio size={18} color="var(--primary-light)" />
-                <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: 'var(--text-bright)' }}>
-                  Real Mobile Push Broadcast Channel
+                <Radio size={18} color="var(--cyan)" />
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-pure)' }}>
+                  Real Mobile Phone Push Channel
                 </h3>
               </div>
-              <span className="cs-badge cs-badge-cyan" style={{ fontSize: '0.68rem' }}>
-                Live Stream
+              <span className="cs-badge cs-badge-cyan" style={{ fontSize: '0.7rem' }}>
+                Instant Push
               </span>
             </div>
 
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
-              Caregivers can receive push notifications on iOS, Android, or desktop web without installing private apps via <strong>ntfy.sh</strong>.
+            <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '1rem' }}>
+              Caregivers can receive push notifications on iOS, Android, or desktop web browsers without creating accounts.
             </p>
 
             <div
@@ -182,13 +182,13 @@ export default function AlertsPage() {
                 justifyContent: 'space-between',
                 gap: '0.5rem',
                 padding: '0.65rem 0.9rem',
-                background: 'var(--surface-3)',
+                background: 'var(--surface-2)',
                 borderRadius: '8px',
-                border: '1px solid var(--border-subtle)',
+                border: '1px solid var(--border-default)',
                 marginBottom: '1rem',
               }}
             >
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--primary-light)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.82rem', color: 'var(--cyan)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 https://ntfy.sh/{topicChannel}
               </div>
 
@@ -197,10 +197,10 @@ export default function AlertsPage() {
                   type="button"
                   onClick={copyChannelUrl}
                   className="cs-btn cs-btn-secondary"
-                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.74rem' }}
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.76rem' }}
                   title="Copy push subscription URL"
                 >
-                  {copiedTopic ? <Check size={13} color="var(--secondary-light)" /> : <Copy size={13} />}
+                  {copiedTopic ? <Check size={13} color="var(--primary)" /> : <Copy size={13} />}
                   <span>{copiedTopic ? 'Copied' : 'Copy'}</span>
                 </button>
 
@@ -209,8 +209,8 @@ export default function AlertsPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cs-btn cs-btn-secondary"
-                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.74rem', textDecoration: 'none' }}
-                  title="Open topic in browser / mobile app"
+                  style={{ padding: '0.35rem 0.65rem', fontSize: '0.76rem', textDecoration: 'none' }}
+                  title="Open topic in browser or app"
                 >
                   <ExternalLink size={13} />
                   <span>Open</span>
@@ -228,66 +228,48 @@ export default function AlertsPage() {
               <Send size={15} />
               <span>
                 {realSendStatus === 'sending'
-                  ? 'Broadcasting to Mobile...'
+                  ? 'Broadcasting to Mobile Phone...'
                   : realSendStatus === 'sent'
-                  ? 'Mobile Alert Delivered Successfully!'
-                  : 'Broadcast Live Push Alert to My Phone'}
+                  ? 'Alert Delivered to Phone!'
+                  : 'Broadcast Test Alert to My Phone'}
               </span>
             </button>
           </div>
 
-          {/* SMS Phone Simulator Graphic */}
-          <div className="cs-card" style={{ padding: '1.25rem', background: 'var(--surface-0)' }}>
+          {/* SMS Notification Simulator */}
+          <div className="cs-card" style={{ padding: '1.25rem', background: '#ffffff' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.65rem', marginBottom: '0.85rem' }}>
               <Smartphone size={16} color="var(--text-muted)" />
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Simulated Carrier SMS &bull; Recipient: <strong>Alice &bull; +1 (555) 019-2834</strong>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Carrier SMS Delivery &bull; Recipient: <strong>Alice (Daughter) &bull; +1 (555) 019-2834</strong>
               </span>
             </div>
 
             <div
               style={{
-                background: 'rgba(220, 38, 38, 0.12)',
+                background: 'var(--danger-subtle)',
                 border: '1px solid var(--danger-border)',
                 borderRadius: '10px',
-                borderTopLeftRadius: '2px',
-                padding: '0.85rem 1rem',
-                color: 'var(--text-bright)',
+                padding: '0.9rem 1.1rem',
+                color: 'var(--text-pure)',
                 marginBottom: '0.85rem',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.35rem' }}>
-                <ShieldAlert size={14} color="var(--danger-light)" />
-                <strong style={{ fontSize: '0.82rem', color: '#fca5a5' }}>
+                <ShieldAlert size={15} color="var(--danger)" />
+                <strong style={{ fontSize: '0.84rem', color: 'var(--danger)' }}>
                   {currentAlert.subject}
                 </strong>
               </div>
-              <p style={{ fontSize: '0.8rem', lineHeight: 1.45, color: '#fee2e2' }}>
+              <p style={{ fontSize: '0.82rem', lineHeight: 1.45, color: '#7f1d1d' }}>
                 {currentAlert.message}
               </p>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.6rem', fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-                <span>AWS SNS &bull; Delivered via SMS</span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--secondary-light)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.6rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                <span>SMS Notification</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '3px', color: 'var(--primary)' }}>
                   <CheckCheck size={13} /> Delivered
                 </span>
               </div>
-            </div>
-
-            {/* AWS SNS Cloud Details */}
-            <div
-              style={{
-                padding: '0.75rem',
-                borderRadius: '8px',
-                background: 'var(--surface-2)',
-                border: '1px solid var(--border-subtle)',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.7rem',
-                color: 'var(--text-muted)',
-              }}
-            >
-              <div><strong>Topic ARN:</strong> {currentAlert.topic_arn}</div>
-              <div style={{ marginTop: '0.2rem' }}><strong>Timestamp:</strong> {currentAlert.timestamp}</div>
-              <div style={{ marginTop: '0.2rem' }}><strong>Simulated Service:</strong> LocalStack SNS Port 4566</div>
             </div>
           </div>
         </div>
