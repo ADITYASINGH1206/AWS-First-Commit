@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCareSync } from '../context/CareSyncContext';
 import {
+  Home,
   Activity,
   CalendarDays,
   Stethoscope,
@@ -11,6 +12,7 @@ import {
   Cpu,
   Smartphone,
   CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function Header() {
@@ -25,6 +27,7 @@ export default function Header() {
   const conflictCount = resultData?.interaction_warnings?.length || 0;
 
   const navItems = [
+    { id: 'home', label: 'Overview', icon: Home },
     { id: 'schedule', label: 'Daily Schedule', icon: CalendarDays },
     { id: 'intake', label: 'Clinical Intake', icon: Stethoscope },
     { id: 'security', label: 'Security Gate', icon: ShieldCheck },

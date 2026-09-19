@@ -1,0 +1,19 @@
+{
+  "name": "caresync-backend",
+  "version": "1.0.0",
+  "description": "CareSync AWS Serverless Backend in TypeScript",
+  "main": "dist/main.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && cp src/mockDb.json dist/ && cp src/policies.cedar dist/",
+    "start": "node dist/localServer.js",
+    "test": "vitest run"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  }
+}
