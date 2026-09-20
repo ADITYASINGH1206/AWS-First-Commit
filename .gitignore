@@ -38,3 +38,7 @@ Thumbs.db
 
 # Agent Skills & Local Configurations
 .agents/
+
+# Presentation, Speaker Notes & Recording Scripts
+speaker_notes.md
+*speaker_notes*.md
