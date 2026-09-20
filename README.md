@@ -1,4 +1,4 @@
-# CareSync — Intelligent Eldercare Medication Safety & Chronotherapy Platform
+# CareSync: Intelligent Eldercare Medication Safety & Chronotherapy Platform
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue.svg?logo=typescript)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg?logo=node.js)](https://nodejs.org/)
@@ -12,23 +12,122 @@
 
 ---
 
-## 🌟 Executive Overview
+## Executive Overview
 
-**CareSync** is an autonomous, policy-governed clinical medication safety and chronotherapy platform built specifically for elderly care. It transforms unstructured doctor voice dictation and prescription photos into safe, structured daily pill schedules while actively intercepting dangerous drug-drug interactions (DDIs).
+CareSync is an autonomous, policy-governed clinical medication safety and chronotherapy platform built specifically for elderly care. It transforms unstructured doctor voice dictation and prescription photos into safe, structured daily pill schedules while actively intercepting dangerous drug-drug interactions (DDIs).
 
-Every year, over **1.5 million elderly individuals** suffer preventable adverse drug reactions resulting from polypharmacy, fragmented care across multiple specialists, and unconfirmed doses. CareSync bridges the gap between clinicians, elderly patients, and family caregivers through:
+Every year, over 1.5 million elderly individuals suffer preventable adverse drug reactions resulting from polypharmacy, fragmented care across multiple specialists, and unconfirmed doses. CareSync bridges the gap between clinicians, elderly patients, and family caregivers through:
 
-1. **Zero-Trust Access Governance** powered by the **AWS Cedar Policy Engine** (`policies.cedar`).
-2. **Clinical RAG (Retrieval-Augmented Generation)** connected to the live **US Food & Drug Administration (openFDA)** Structured Product Label API and DailyMed monographs.
-3. **Computer Vision & OCR Prescription Bottle Scanner** allowing caregivers to snap photos of pill bottles and import dosages with one click.
-4. **Live Ambient Microphone Dictation** transcribing doctor voice notes directly in the browser via the Web Speech API.
-5. **Circadian Chronotherapy Scheduler** organizing daily pills across four pharmacokinetic timing slots (*Morning, Afternoon, Evening, Bedtime*).
-6. **Smart Adherence Escalation Ladder** executing a multi-tier alert sequence (*bedside chime $\rightarrow$ smartphone push notification $\rightarrow$ emergency SMS dispatch*) for missed doses.
-7. **Persistent File-Backed Database Engine** ensuring custom medications, new patient records, clinical notes, and dose adherence checkmarks stay permanently saved across server restarts and browser reloads.
+1. Zero-Trust Access Governance powered by the AWS Cedar Policy Engine (`policies.cedar`).
+2. Clinical RAG (Retrieval-Augmented Generation) connected to the live US Food and Drug Administration (openFDA) Structured Product Label API and DailyMed monographs.
+3. Computer Vision and OCR Prescription Bottle Scanner allowing caregivers to snap photos of pill bottles and import dosages with one click.
+4. Live Ambient Microphone Dictation transcribing doctor voice notes directly in the browser via the Web Speech API.
+5. Circadian Chronotherapy Scheduler organizing daily pills across four pharmacokinetic timing slots (Morning, Afternoon, Evening, Bedtime).
+6. Smart Adherence Escalation Ladder executing a multi-tier alert sequence (bedside chime -> smartphone push notification -> emergency SMS dispatch) for missed doses.
+7. Persistent File-Backed Database Engine ensuring custom medications, new patient records, clinical notes, and dose adherence checkmarks stay permanently saved across server restarts and browser reloads.
 
 ---
 
-## 🚀 Core Features & Architectural Capabilities
+## System Architecture
+
+```mermaid
+flowchart TD
+    subgraph ClientLayer["Client Layer (React 19 + Vite 6)"]
+        UI["CareSync Web Interface\n(Dashboard, Intake, Schedule, Clinical RAG, Security)"]
+        Speech["Web Speech API\n(Ambient Voice Dictation)"]
+        Vision["Client-side OCR Engine\n(Prescription Label Scanner)"]
+        Audio["Web Audio API\n(Bedside Chime Engine)"]
+        State["CareSyncContext\n(Reactive State & LocalStorage Sync)"]
+        UI --> Speech
+        UI --> Vision
+        UI --> Audio
+        UI --> State
+    end
+
+    subgraph APILayer["API Gateway & Serverless Layer (Node.js 20+ / TypeScript)"]
+        Router["REST Route Dispatcher & Lambda Handler\n(src/main.ts, src/localServer.ts)"]
+        State <-->|HTTP / JSON REST API| Router
+    end
+
+    subgraph SecuritySubsystem["Zero-Trust Security Subsystem"]
+        Cedar["AWS Cedar Policy Engine\n(policies.cedar / src/cedarAuth.ts)"]
+        Router -->|1. Authorize Principal & Action| Cedar
+    end
+
+    subgraph ClinicalEngine["Clinical Intelligence & RAG Subsystem"]
+        FDA["openFDA Client & RAG Engine\n(src/fdaRag.ts)"]
+        Tools["Agent Tools & Interaction Matrix\n(src/tools.ts, src/agent.ts)"]
+        Router -->|2. Query Clinical Safety| Tools
+        Tools --> FDA
+    end
+
+    subgraph ExternalServices["External Cloud & Knowledge Services"]
+        OpenFDA_API["US openFDA REST API\n(api.fda.gov/drug/label.json)"]
+        Push_API["ntfy.sh & Amazon SNS Dispatcher\n(src/notifier.ts)"]
+        FDA -->|Live Monograph Retrieval| OpenFDA_API
+        Router -->|3. High-Priority Push Alerts| Push_API
+    end
+
+    subgraph PersistenceLayer["Storage & Data Persistence Subsystem"]
+        DB["File-Backed Database Engine\n(src/db.ts)"]
+        MockDB[("Persistent JSON Store\nsrc/mockDb.json")]
+        Router -->|4. Read / Write Patients, Regimens & Adherence| DB
+        DB <--> MockDB
+    end
+```
+
+---
+
+## Clinical Processing and Safety Workflow
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Clinician as Doctor / Caregiver
+    participant UI as CareSync UI
+    participant Cedar as AWS Cedar Auth
+    participant Core as Clinical Processing Engine
+    participant FDA as openFDA RAG Service
+    participant DB as Persistent DB
+    participant Notifier as Alert & Push Notifier
+
+    Clinician->>UI: Submit Clinical Voice Note / OCR Label
+    UI->>Core: POST /process-note (Patient, Note, Principal)
+    
+    Core->>Cedar: isAuthorized(Principal, Action::ViewPatientRecord, Resource)
+    alt Access Denied (Unauthorized Principal)
+        Cedar-->>Core: Deny (403 Forbidden)
+        Core-->>UI: 403 Forbidden (Security Diagnostic Barrier)
+        UI-->>Clinician: Access Denied Alert
+    else Access Permitted
+        Cedar-->>Core: Allow (Permitted by healthcare proxy policy)
+        
+        Core->>DB: Fetch Active Patient Regimen & Allergies
+        DB-->>Core: Current Regimen
+        
+        Core->>FDA: Query openFDA API for Prescribed Drug
+        FDA-->>Core: Label Monograph, Boxed Warnings, Geriatric Precautions
+        
+        Core->>Core: Cross-Check Drug Interactions & Conflict Matrix
+        
+        alt Dangerous Drug Interaction Detected
+            Core->>Notifier: Dispatch High-Priority Push Alert (Amazon SNS / ntfy.sh)
+            Notifier-->>Clinician: Instant Smartphone Alert
+            Core->>DB: Log Interaction Warning Alert
+        end
+        
+        Core->>Core: Calculate Circadian Chronotherapy Schedule (Morning, Afternoon, Evening, Bedtime)
+        Core->>DB: Save Updated Patient Medications & Schedule
+        DB-->>Core: Confirmation
+        
+        Core-->>UI: 200 OK (Schedule, Interaction Warnings, Clinical Trace)
+        UI-->>Clinician: Render Interactive Schedule & Safety Callouts
+    end
+```
+
+---
+
+## Core Features and Architectural Capabilities
 
 ### 1. Zero-Trust Access Control (AWS Cedar Policy Engine)
 - Formally validates healthcare proxy relationships using AWS Cedar policies (`policies.cedar`) before any patient data can be read or modified.
@@ -43,46 +142,46 @@ Every year, over **1.5 million elderly individuals** suffer preventable adverse 
       principal in resource.authorized_family
   };
   ```
-- Rejects unauthorized entities (e.g., `User::Eve`) with **HTTP 403 Forbidden** and visual security diagnostic alerts before clinical history or medication schedules are accessed.
+- Rejects unauthorized entities (such as `User::Eve`) with HTTP 403 Forbidden and visual security diagnostic alerts before clinical history or medication schedules are accessed.
 
-### 2. Clinical RAG & Official FDA Drug Safety Explorer
-- Real-time **Retrieval-Augmented Generation** querying the live **US openFDA API** (`api.fda.gov/drug/label.json`) and DailyMed monographs.
-- Evaluates any prescribed medication globally (e.g. *Lisinopril, Metformin, Warfarin, Ibuprofen, Atorvastatin, Eliquis*).
+### 2. Clinical RAG and Official FDA Drug Safety Explorer
+- Real-time Retrieval-Augmented Generation querying the live US openFDA API (`api.fda.gov/drug/label.json`) and DailyMed monographs.
+- Evaluates any prescribed medication globally (such as Lisinopril, Metformin, Warfarin, Ibuprofen, Atorvastatin, Eliquis).
 - Extracts and cites:
-  - **FDA Black Box Warnings** (highlighted in prominent clinical callout cards).
-  - **Geriatric Dosing & Clearance Advisories** (assessing renal, hepatic, and fall risk in seniors).
-  - **Official Contraindications** and drug interaction pharmacology.
+  - FDA Black Box Warnings (highlighted in prominent clinical callout cards).
+  - Geriatric Dosing and Clearance Advisories (assessing renal, hepatic, and fall risk in seniors).
+  - Official Contraindications and drug interaction pharmacology.
   - Live links back to official FDA DailyMed Structured Product Label (SPL) monographs.
 - Live RAG conflict analyzer compares queried medications against the active patient's current regimen, citing the exact FDA label excerpts and recommending safe clinical alternatives.
 
-### 3. Computer Vision & OCR Prescription Bottle Scanner
+### 3. Computer Vision and OCR Prescription Bottle Scanner
 - Allows caregivers to photograph or upload prescription labels, pill bottles, or blister packs.
 - Executes client-side OCR extraction with laser-scanning visualization.
 - Automatically parses:
-  - **Medication Name & Strength** (e.g., *Metformin 500mg*, *Atorvastatin 20mg*).
-  - **Sig & Administration Directives** (e.g., *Take 1 tablet twice daily with meals*).
-  - **Circadian Slot & Refill Details**.
-- One-click actions to **Import Directly into Daily Schedule** or **Append to Clinical Intake Dictation**.
+  - Medication Name and Strength (for example, Metformin 500mg, Atorvastatin 20mg).
+  - Sig and Administration Directives (for example, Take 1 tablet twice daily with meals).
+  - Circadian Slot and Refill Details.
+- One-click actions to Import Directly into Daily Schedule or Append to Clinical Intake Dictation.
 
 ### 4. Live Ambient Microphone Voice Dictation
-- Uses the browser's native **Web Speech API** (`SpeechRecognition` / `webkitSpeechRecognition`).
-- Clinicians or caregivers can toggle **Live Mic Dictate** to stream spoken dictation directly into the clinical intake note in real time.
+- Uses the browser's native Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`).
+- Clinicians or caregivers can toggle Live Mic Dictate to stream spoken dictation directly into the clinical intake note in real time.
 - Features synthesized audio playback so elderly patients can listen to prescription instructions read aloud.
 
-### 5. Circadian Chronotherapy 4-Slot Scheduler & Persistent Adherence
+### 5. Circadian Chronotherapy 4-Slot Scheduler and Persistent Adherence
 - Schedules medications across four biologically optimized windows:
-  - **Morning Regimen** (08:00 AM) — Blood pressure agents, daily maintenance.
-  - **Afternoon Regimen** (01:00 PM) — Midday doses, dietary supplements.
-  - **Evening Regimen** (07:00 PM) — Lipid-lowering agents, dinner medications.
-  - **Bedtime Regimen** (10:00 PM) — Sleep aids, nocturnal blood pressure control.
-- Tactile dose checkmarks: Clicking a pill marks it as `TAKEN` with a timestamp. Adherence checkmarks persist to the backend database and stay checked across page reloads.
-- Includes confetti celebration when daily adherence reaches 100%.
+  - Morning Regimen (08:00 AM): Blood pressure agents, daily maintenance.
+  - Afternoon Regimen (01:00 PM): Midday doses, dietary supplements.
+  - Evening Regimen (07:00 PM): Lipid-lowering agents, dinner medications.
+  - Bedtime Regimen (10:00 PM): Sleep aids, nocturnal blood pressure control.
+- Tactile dose checkmarks: Clicking a pill marks it as TAKEN with a timestamp. Adherence checkmarks persist to the backend database and stay checked across page reloads.
+- Includes celebration effects when daily adherence reaches 100%.
 
 ### 6. Smart Adherence Escalation Ladder
 - Automated multi-tier escalation protocol for missed doses:
-  - **Tier 1 (T + 0 min)**: Gentle harmonic audio chime on bedside smart tablet.
-  - **Tier 2 (T + 15 min)**: Real-time high-priority push notification sent to family caregiver's smartphone via **ntfy.sh**.
-  - **Tier 3 (T + 45 min)**: Critical emergency dispatch receipt with automated SMS broadcasting to emergency contacts.
+  - Tier 1 (T + 0 min): Gentle harmonic audio chime on bedside smart tablet.
+  - Tier 2 (T + 15 min): Real-time high-priority push notification sent to family caregiver's smartphone via ntfy.sh.
+  - Tier 3 (T + 45 min): Critical emergency dispatch receipt with automated SMS broadcasting to emergency contacts.
 - Interactive simulator allows caregivers to test all three escalation tiers with real audio and phone delivery.
 
 ### 7. Persistent File-Backed Database Engine
@@ -95,81 +194,81 @@ Every year, over **1.5 million elderly individuals** suffer preventable adverse 
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 | Layer | Technology | Role in CareSync |
 | :--- | :--- | :--- |
 | **Backend Runtime** | **TypeScript 5.8 / Node.js 20+** | High-performance, strictly typed serverless service |
-| **Cloud Simulation** | **AWS SAM Local / Native HTTP Server** | Local execution mirroring AWS API Gateway & Lambda contracts |
+| **Cloud Simulation** | **AWS SAM Local / Native HTTP Server** | Local execution mirroring AWS API Gateway and Lambda contracts |
 | **Security Policy Engine** | **AWS Cedar (`policies.cedar`)** | Zero-Trust RBAC/ABAC authorization before clinical data access |
 | **Clinical Knowledge** | **openFDA REST API (`api.fda.gov`)** | Live US FDA Structured Product Label monographs |
-| **Notifications** | **ntfy.sh & Amazon SNS Engine** | Multi-channel instant smartphone push & simulated SMS receipts |
+| **Notifications** | **ntfy.sh and Amazon SNS Engine** | Multi-channel instant smartphone push and simulated SMS receipts |
 | **Frontend Framework** | **React 19 & Vite 6** | Ultra-fast client-side reactive user interface (builds in ~130ms) |
-| **Voice & Vision** | **Web Speech API & Client-side OCR** | Ambient voice dictation & prescription bottle label scanning |
+| **Voice & Vision** | **Web Speech API & Client-side OCR** | Ambient voice dictation and prescription bottle label scanning |
 | **Audio** | **Web Audio API** | Harmonic bedside chimes for Tier 1 adherence reminders |
 | **Testing** | **Vitest 3.2** | Automated unit and integration test runner (16/16 tests passing) |
 
 ---
 
-## 📁 Repository Directory Structure
+## Repository Directory Structure
 
 ```
 .
 ├── backend/
 │   ├── src/
-│   │   ├── agent.ts                   # Golden path orchestration & clinical analysis loop
+│   │   ├── agent.ts                   # Golden path orchestration and clinical analysis loop
 │   │   ├── cedarAuth.ts               # AWS Cedar Zero-Trust policy evaluation wrapper
 │   │   ├── db.ts                      # Persistent file-backed JSON database engine
-│   │   ├── fdaRag.ts                  # Live openFDA API query engine & RAG conflict analyzer
+│   │   ├── fdaRag.ts                  # Live openFDA API query engine and RAG conflict analyzer
 │   │   ├── localServer.ts             # Native Node.js HTTP runner on port 3001
-│   │   ├── main.ts                    # AWS Lambda handler & REST route dispatcher
+│   │   ├── main.ts                    # AWS Lambda handler and REST route dispatcher
 │   │   ├── mockDb.json                # Seed patient database, interaction pharmacology, alerts
-│   │   ├── notifier.ts                # Multi-channel push notification & SNS alert dispatcher
+│   │   ├── notifier.ts                # Multi-channel push notification and SNS alert dispatcher
 │   │   ├── policies.cedar             # Cedar policy definitions for healthcare proxy access
 │   │   ├── tools.ts                   # Clinical agent tools (history, interaction checks, schedule)
 │   │   └── types.ts                   # Comprehensive TypeScript domain interfaces
 │   ├── tests/
 │   │   ├── cedarAuth.test.ts          # Cedar authorization allow/deny verification tests
-│   │   ├── fdaRag.test.ts             # Live openFDA API query & RAG conflict check tests
+│   │   ├── fdaRag.test.ts             # Live openFDA API query and RAG conflict check tests
 │   │   ├── goldenPath.test.ts         # End-to-end clinical note processing tests
 │   │   ├── realNotifications.test.ts  # Mobile push notification dispatch tests
-│   │   └── tools.test.ts              # Regimen scheduler & drug interaction isolation tests
-│   ├── package.json                   # Backend scripts & dependency manifests
+│   │   └── tools.test.ts              # Regimen scheduler and drug interaction isolation tests
+│   ├── package.json                   # Backend scripts and dependency manifests
 │   ├── template.yaml                  # AWS SAM serverless definition (Node.js 20+ runtime)
 │   └── tsconfig.json                  # Strict TypeScript compiler options
 ├── frontend/
 │   ├── public/assets/                 # Visual concept showcases (hero dashboard, Cedar shield, schedule)
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── AdherenceEscalationModal.jsx   # Multi-tier adherence escalation ladder & simulator
+│   │   │   ├── AdherenceEscalationModal.jsx   # Multi-tier adherence escalation ladder and simulator
 │   │   │   ├── CaregiverSnsDrawer.jsx         # Slide-out real-time emergency alert drawer
 │   │   │   ├── CedarSecuritySelector.jsx      # Interactive Zero-Trust persona switcher (Alice, Charlie, Eve)
 │   │   │   ├── ConflictAlertBanner.jsx        # Prominent adverse drug interaction callout banner
-│   │   │   ├── ExecutionTraceModal.jsx        # Deep diagnostics & agent execution trace inspector
+│   │   │   ├── ExecutionTraceModal.jsx        # Deep diagnostics and execution trace inspector
 │   │   │   ├── Header.jsx                     # Sticky navigation bar with quick action buttons
-│   │   │   ├── ManageMedicationsModal.jsx     # Custom medication, patient CRUD & database manager
+│   │   │   ├── ManageMedicationsModal.jsx     # Custom medication, patient CRUD and database manager
 │   │   │   ├── PillScheduleBoard.jsx          # 4-slot chronotherapy pill schedule with persistent checkmarks
 │   │   │   ├── PrescriptionScannerModal.jsx   # Computer vision OCR prescription bottle scanner
 │   │   │   └── VoiceNoteRecorder.jsx          # Ambient live microphone voice dictation console
 │   │   ├── context/
-│   │   │   └── CareSyncContext.jsx            # Global state management & localStorage persistence sync
+│   │   │   └── CareSyncContext.jsx            # Global state management and localStorage persistence sync
 │   │   ├── pages/
-│   │   │   ├── AlertsPage.jsx                 # Mobile alert log & emergency dispatch testing page
-│   │   │   ├── FdaRagExplorerPage.jsx         # Clinical RAG & live openFDA drug safety explorer
+│   │   │   ├── AlertsPage.jsx                 # Mobile alert log and emergency dispatch testing page
+│   │   │   ├── FdaRagExplorerPage.jsx         # Clinical RAG and live openFDA drug safety explorer
 │   │   │   ├── HomePage.jsx                   # Interactive product overview landing page
-│   │   │   ├── IntakePage.jsx                 # Doctor voice intake & clinical extraction console
-│   │   │   ├── SchedulePage.jsx               # Daily chronotherapy pill schedule & regimen manager
-│   │   │   ├── SecurityPage.jsx               # Zero-Trust Cedar access control & diagnostics view
-│   │   │   └── TelemetryPage.jsx              # System architecture, telemetry & diagnostics console
+│   │   │   ├── IntakePage.jsx                 # Doctor voice intake and clinical extraction console
+│   │   │   ├── SchedulePage.jsx               # Daily chronotherapy pill schedule and regimen manager
+│   │   │   ├── SecurityPage.jsx               # Zero-Trust Cedar access control and diagnostics view
+│   │   │   └── TelemetryPage.jsx              # System architecture, telemetry and diagnostics console
 │   │   ├── services/
 │   │   │   └── api.js                         # REST API client with offline fallback simulation
-│   │   ├── App.jsx                            # Main application layout & modal orchestration
+│   │   ├── App.jsx                            # Main application layout and modal orchestration
 │   │   ├── index.css                          # Design system tokens, light-mode palette, animations
 │   │   └── main.jsx                           # Application entry point
 │   ├── index.html                             # HTML5 template with Google Fonts typography
-│   ├── package.json                           # Frontend dependencies & Vite configuration
+│   ├── package.json                           # Frontend dependencies and Vite configuration
 │   └── vite.config.js                         # Vite build configuration
-├── docs/                                      # Architectural specs & AWS configuration guides
+├── docs/                                      # Architectural specs and AWS configuration guides
 │   ├── 01_ARCHITECTURE_OVERVIEW.md
 │   ├── 02_AWS_LOCAL_SETUP_GUIDE.md
 │   ├── 03_CEDAR_AUTHORIZATION_ENGINE.md
@@ -179,17 +278,18 @@ Every year, over **1.5 million elderly individuals** suffer preventable adverse 
 │   ├── 07_FRONTEND_UI_SPECIFICATION.md
 │   └── 08_TESTING_AND_VERIFICATION_PROTOCOL.md
 ├── .gitignore
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## ⚡ Quick Start: Running CareSync Locally
+## Quick Start: Running CareSync Locally
 
 ### Prerequisites
-- **Node.js**: v20.0.0 or higher
-- **npm**: v9.0.0 or higher
-- **Git**
+- Node.js: v20.0.0 or higher
+- npm: v9.0.0 or higher
+- Git
 
 ---
 
@@ -201,35 +301,35 @@ cd AWS-First-Commit
 
 ---
 
-### 2. Set Up & Start Backend Serverless API
+### 2. Set Up and Start Backend Serverless API
 ```bash
 cd backend
 npm install
 npm run build
 npm start
 ```
-The backend starts at **`http://localhost:3001`**, exposing the Lambda handler via native Node.js HTTP server.
+The backend starts at `http://localhost:3001`, exposing the Lambda handler via native Node.js HTTP server.
 
 To run the automated Vitest test suite:
 ```bash
 npm test
 ```
-*All 16 tests will execute and pass, verifying Cedar authorization, agent tools, live FDA API integration, and push notifications.*
+All 16 tests will execute and pass, verifying Cedar authorization, agent tools, live FDA API integration, and push notifications.
 
 ---
 
-### 3. Set Up & Start Frontend Web Application
+### 3. Set Up and Start Frontend Web Application
 In a new terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open **`http://localhost:5173`** in your browser to launch the CareSync application.
+Open `http://localhost:5173` in your browser to launch the CareSync application.
 
 ---
 
-## 🌐 REST API Endpoints Reference
+## REST API Endpoints Reference
 
 The backend exposes the following REST endpoints on `http://localhost:3001`:
 
@@ -250,21 +350,9 @@ The backend exposes the following REST endpoints on `http://localhost:3001`:
 | `GET` | `/interactions` | Queries the pharmacologic drug-drug interaction matrix |
 | `POST` | `/reset-db` | Restores the persistent database back to initial demonstration seed data |
 
-## 🏆 AWS First Commit Hackathon — Judging Criteria Scorecard & Qualification
-
-CareSync was architected specifically to qualify and excel across all five official hackathon evaluation criteria:
-
-| Criterion | Evaluation Metric | How CareSync Delivers & Proves It |
-| :--- | :--- | :--- |
-| **01. Idea and Impact** | *Does it solve a real problem? What changes for people on the other side?* | Solves preventable adverse drug events in geriatric polypharmacy (>1.5M seniors affected annually). CareSync empowers seniors to live safely at home while providing family caregivers real-time oversight and instant notification of missed doses or dangerous drug conflicts. |
-| **02. Built on AWS** | *AWS open-source projects or AWS services (Free Tier / credits)* | Integrates the **AWS Cedar Policy Engine** (`policies.cedar`) for zero-trust authorization, **Amazon SNS** architecture for multi-tier mobile and SMS alert broadcasting, and **AWS SAM Local** infrastructure-as-code deployment templates. |
-| **03. Learning** | *What did the team learn that they didn't know before?* | Mastered the formal syntax and sub-millisecond evaluation semantics of **AWS Cedar policies**, architected live **openFDA Clinical RAG** pipelines using official DailyMed drug labeling, and designed resilient circadian chronotherapy algorithms. |
-| **04. The Execution** | *Does it work? Working features that run reliably.* | 100% functional, full-stack application. 16/16 Vitest automated unit/integration tests passing. Live Web Speech API microphone dictation, client-side OCR computer vision pill scanner, live openFDA API queries, and disk-backed database persistence. |
-| **05. The Demo Video** | *Under 3-minute recorded walkthrough showing problem, user, and AWS integration.* | Dedicated, rehearsed 2:45 presentation flow accompanied by local speaker notes (`speaker_notes.md`) showcasing the live browser workflow, Cedar 403 access denial, openFDA RAG search, and real-time push alerts. |
-
 ---
 
-## 🔒 Security & Privacy Architecture
+## Security and Privacy Architecture
 
 1. **Principle of Least Privilege (PoLP)**: Access to clinical records is denied by default. Explicit permission must be granted by Cedar policies evaluated in real time.
 2. **Healthcare Proxy Guardrails**: Only authenticated family members and verified proxies listed in `resource.authorized_family` can access patient history or update adherence.
@@ -272,7 +360,7 @@ CareSync was architected specifically to qualify and excel across all five offic
 
 ---
 
-## 🧪 Automated Testing Protocol
+## Automated Testing Protocol
 
 To execute the automated backend test suite:
 ```bash
@@ -282,11 +370,11 @@ npm test
 
 Expected output:
 ```
-✓ tests/tools.test.ts (4 tests)
-✓ tests/cedarAuth.test.ts (4 tests)
-✓ tests/goldenPath.test.ts (1 test)
-✓ tests/realNotifications.test.ts (3 tests)
-✓ tests/fdaRag.test.ts (4 tests)
+PASS tests/tools.test.ts (4 tests)
+PASS tests/cedarAuth.test.ts (4 tests)
+PASS tests/goldenPath.test.ts (1 test)
+PASS tests/realNotifications.test.ts (3 tests)
+PASS tests/fdaRag.test.ts (4 tests)
 
 Test Files  5 passed (5)
 Tests       16 passed (16)
@@ -299,12 +387,12 @@ npm run build
 ```
 Expected output:
 ```
-✓ built in ~130ms (0 errors, production bundle ready)
+built in ~130ms (0 errors, production bundle ready)
 ```
 
 ---
 
-## 📄 License
+## License
 
 CareSync is open-source software built for the **AWS First Commit Hackathon (Build It: Local / AWS-Simulated Track)**.
 Licensed under the [MIT License](LICENSE).
