@@ -4,6 +4,7 @@
   "description": "CareSync AWS Serverless Backend in TypeScript",
   "main": "dist/main.js",
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "build": "tsc && cp src/mockDb.json dist/ && cp src/policies.cedar dist/",
     "start": "node dist/localServer.js",

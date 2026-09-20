@@ -7,6 +7,7 @@
 [![AWS SAM](https://img.shields.io/badge/AWS-SAM%20Local-orange.svg?logo=amazon-aws)](https://aws.amazon.com/serverless/sam/)
 [![openFDA](https://img.shields.io/badge/openFDA-Live%20API-blue.svg)](https://open.fda.gov/)
 [![Zero-Trust Cedar](https://img.shields.io/badge/Security-AWS%20Cedar-red.svg)](https://www.cedarpolicy.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Vitest-16%2F16%20Passed-brightgreen.svg?logo=vitest)](https://vitest.dev/)
 
 ---
@@ -306,4 +307,4 @@ Expected output:
 ## 📄 License
 
 CareSync is open-source software built for the **AWS First Commit Hackathon (Build It: Local / AWS-Simulated Track)**.
-Licensed under the [Apache 2.0 License](LICENSE).
+Licensed under the [MIT License](LICENSE).
